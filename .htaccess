@@ -1,0 +1,11 @@
+
+# design
+RewriteEngine On
+RewriteBase /jquery-isystkOverlay/
+RewriteCond %{REQUEST_URI} !/jquery-isystkOverlay/dist
+RewriteCond %{REQUEST_URI} !/jquery-isystkOverlay/git-hook.php
+RewriteRule ^(.*)$ dist/$1 [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /jquery-isystkOverlay/ [L,R=301]
+
