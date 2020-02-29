@@ -62,7 +62,7 @@ const webpackConfig = {
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin(),
     new MiniCssExtractPlugin({
-      filename: 'common.css' // Dist
+      filename: '[name].css' // Dist
     }),
     new CopyFilePlugin(
       [
@@ -87,8 +87,8 @@ const webpackConfig = {
 Object.keys(webpackConfig.entry).forEach((key) => {
   webpackConfig.plugins.push(
     new HtmlWebpackPlugin({
-      template: './assets/index.html', // Source
-      filename: './index.html', // Dist
+      template: './assets/'+key+'.html', // Source
+      filename: './'+key+'.html', // Dist
       inject: true,
       chunks: [key], // insert to the root of output folder
     })
