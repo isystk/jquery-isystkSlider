@@ -87,8 +87,8 @@ const webpackConfig = {
 Object.keys(webpackConfig.entry).forEach((key) => {
   webpackConfig.plugins.push(
     new HtmlWebpackPlugin({
-      template: './assets/index.html', // Source
-      filename: './index.html', // Dist
+      template: './assets/html/index.html', // Source
+      filename: './html/index.html', // Dist
       inject: true,
       chunks: [key], // insert to the root of output folder
     })
