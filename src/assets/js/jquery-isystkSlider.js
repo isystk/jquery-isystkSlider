@@ -97,8 +97,7 @@
 					var photo = $(this),
 						imagePath = photo.attr('src') || '';
 					var img = $('<img>');
-					img
-						.load(function() {
+					img.on('load',function() {
 							photo.attr('owidth', img[0].width);
 							photo.attr('oheight', img[0].height);
 							if (photoLength !== 1) {
