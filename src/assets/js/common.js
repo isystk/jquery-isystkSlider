@@ -71,24 +71,39 @@ $(function() {
 		var self = $(this),
 			shift = self.data('shift'),
 			carousel = self.data('carousel'),
-			autoSlide = self.data('auto-slide');
+			autoSlide = self.data('auto-slide'),
+			swipe = self.data('swipe');
+
+		if (swipe) {
+			self.find('.view-layer').css({
+				'width': '307px'
+			});
+		}
+
 		var slider = self.isystkSlider({
 			'parentKey': '.parent',
 			'childKey': '.child',
 			'shift': shift,
 			'carousel': carousel,
+			'isMouseDrag': swipe,
 			'autoSlide': autoSlide,
 			'prevBtnKey': self.find('.prev-btn'),
 			'nextBtnKey': self.find('.next-btn'),
 			'slideCallBack': function(data) {
-				slider.find('.slide_dot li').removeClass('active');
-				slider.find('.slide_dot li:eq('+(data.pageNo-1)+')').addClass('active');
+				slider.find('.paging li').removeClass('active');
+				slider.find('.paging li:eq('+(data.pageNo-1)+')').addClass('active');
 			}
 		});
-		slider.find('.slide_dot li').click(function(e) {
+		slider.find('.paging li').click(function(e) {
 			e.preventDefault();
 			slider.changePage($(this).data('pageno'), $.fn.isystkSlider.ANIMATE_TYPE.SLIDE);
 		});
+		// ページングボタンがある場合は左にマージンを追加
+		if (0 < self.find('.prev-btn').length) {
+			self.find('.view-layer').css({
+				'margin-left': '36px'
+			});
+		}
 	});
 
 });

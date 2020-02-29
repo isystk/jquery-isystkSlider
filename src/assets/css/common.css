@@ -595,7 +595,39 @@ border-radius: 25px;
 bottom: -100px;
 }
 
-
+/* ポイント */
+.entry-content ul.point {
+position: relative;
+border: 4px solid #0ba9ea;
+border-radius: 5px;
+margin: 12px 0 12px 0;
+padding: 12px;
+}
+.entry-content ul.point li{
+margin-bottom: 5px;
+}
+.entry-content ul.point li::before {
+content:  "・";
+color:#0ba9ea;
+}
+/* メモ */
+.entry-content ol.memo {
+position: relative;
+border: 4px solid #000055;
+border-radius: 5px;
+margin: 12px 0 12px 0;
+padding: 12px 12px 12px 32px;
+text-indent: 5.5px;
+}
+.entry-content ol.memo li{
+margin-bottom: 5px;
+}
+.entry-content ol.memo li {
+list-style: decimal;
+color:#000055;
+}
+	
+	
 /* 画面サイズが992pxより大きい場合に以下を適用 */
 @media screen and (min-width:992px){
 
@@ -693,8 +725,7 @@ width: 650px;
 }
 .isystkSlider .view-layer {
 overflow: hidden;
-margin-left: 45px;
-width: 565px;
+width: 578px;
 }
 .isystkSlider ul.parent{
 margin-bottom:10px;
@@ -708,13 +739,14 @@ border:solid 1px #dedede;
 background:#fff;
 padding:3px;
 }
-.isystkSlider li.child p img{
+.isystkSlider img{
 vertical-align: middle;
 }
 .isystkSlider .prev-btn,
 .isystkSlider .next-btn{
 position: absolute;
-top: 25px;
+top: 50%;
+margin-top: -1em;
 width: 30px;
 }
 .isystkSlider .prev-btn img,
@@ -724,20 +756,30 @@ width: 30px;
 .isystkSlider .next-btn{
 right: 0;
 }
-.isystkSlider .slide_dot {
+.isystkSlider .paging {
 display: flex;
 justify-content: space-around;
+padding: 0;
+margin: 6px;
+width: 565px;
+}
+.isystkSlider .paging p{
+margin:0 5px 0 0;
+border:solid 1px #dedede;
+background:#fff;
+padding:3px;
+}
+.isystkSlider .paging.dot {
 width: 24%;
 margin: 5px auto;
-padding: 0;
 }
-.isystkSlider .slide_dot li {
+.isystkSlider .paging.dot li {
 border: 1px solid #666;
 border-radius: 50%;
 width: 7px;
 height: 7px;
 list-style-type: none;
 }
-.isystkSlider .slide_dot li.active {
+.isystkSlider .paging.dot li.active {
 background: #666;
 }

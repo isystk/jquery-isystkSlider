@@ -332,7 +332,7 @@
 			}
 
 			ul
-				.append(li.clone(true).addClass('cloned'))
+			.append(li.clone(true).addClass('cloned'))
 				.css('left', '-' + (liwidth*(li.length)) + 'px');
 
 			// liを再キャッシュ
