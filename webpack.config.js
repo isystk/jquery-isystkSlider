@@ -48,7 +48,7 @@ const webpackConfig = {
                       name: '[name].[ext]',
                       outputPath : 'images/',
                       publicPath : function(path){
-                          return '../images/' + path;
+                          return './images/' + path;
                       },
                       esModule: false
                   }
@@ -62,13 +62,13 @@ const webpackConfig = {
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin(),
     new MiniCssExtractPlugin({
-      filename: 'css/common.css' // Dist
+      filename: 'common.css' // Dist
     }),
     new CopyFilePlugin(
       [
         {
           context: "assets/js",
-          from: "jquery-isystkOverlay.js",
+          from: "jquery-isystkSlider.js",
           to: "js"
         }
       ],
@@ -87,8 +87,8 @@ const webpackConfig = {
 Object.keys(webpackConfig.entry).forEach((key) => {
   webpackConfig.plugins.push(
     new HtmlWebpackPlugin({
-      template: './assets/html/index.html', // Source
-      filename: './html/index.html', // Dist
+      template: './assets/index.html', // Source
+      filename: './index.html', // Dist
       inject: true,
       chunks: [key], // insert to the root of output folder
     })

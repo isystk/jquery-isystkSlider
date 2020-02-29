@@ -1,9 +1,477 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Webpack App</title>
-  <link href="css/common.css" rel="stylesheet"></head>
-  <body>
-  <script type="text/javascript" src="js/index.js"></script></body>
+<!DOCTYPE HTML>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="robots" content="noindex, nofollow">
+  <title>画像スライダー | DEMOページ</title>
+<link href="common.css" rel="stylesheet"></head>
+<body class="column2 side-left">
+  <div class="wrap">
+    <header>
+      <div class="header-image">
+        <div class="logo">画像スライダー</div>
+      </div>
+    </header>
+    <div class="content">
+      <main>
+        <article class="detail" >
+          <div class="entry-header">
+            <h1 class="entry-title"><a href="#">画像スライダーのサンプル</a></h1>
+          </div>
+          <div class="entry-content">
+            <h2>デモ</h2>
+
+            <h3>１ページ５枚：カルーセルなし</h3>
+            <div class="js-slider isystkSlider" data-shift="5" data-carousel="false">
+              <div class="view-layer">
+                <ul class="parent">
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo1.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo2.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo3.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo4.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo5.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo6.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo7.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo8.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo9.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo10.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo11.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo12.jpg" width="103px">
+                    </p>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <p class="next-btn"><a href="#"><img src="./images/btn-next.png" alt="次へ" ></a></p>
+                <p class="prev-btn"><a href="#"><img src="./images/btn-prev.png" alt="前へ" ></a></p>
+                <ul class="paging dot">
+                  <li class="active" data-pageno="1"></li>
+                  <li data-pageno="2"></li>
+                  <li data-pageno="3"></li>
+                </ul>
+              </div>
+            </div>
+
+            <h3>１ページ５枚：カルーセルあり、自動スクロール</h3>
+            <div class="js-slider isystkSlider" data-shift="5" data-carousel="true" data-auto-slide="true">
+              <div class="view-layer">
+                <ul class="parent">
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo1.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo2.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo3.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo4.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo5.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo6.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo7.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo8.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo9.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo10.jpg" width="103px">
+                    </p>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <p class="next-btn"><a href="#"><img src="./images/btn-next.png" alt="次へ" ></a></p>
+                <p class="prev-btn"><a href="#"><img src="./images/btn-prev.png" alt="前へ" ></a></p>
+                <ul class="paging dot">
+                  <li class="active" data-pageno="1"></li>
+                  <li data-pageno="2"></li>
+                </ul>
+              </div>
+            </div>
+
+            <h3>１ページ３枚：カルーセルあり、シフト１</h3>
+            <div class="js-slider isystkSlider" data-shift="1" data-carousel="true" >
+              <div class="view-layer">
+                <ul class="parent">
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo1.jpg" width="180px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo2.jpg" width="180px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo3.jpg" width="180px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo4.jpg" width="180px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo5.jpg" width="180px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo6.jpg" width="180px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo7.jpg" width="180px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo8.jpg" width="180px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo9.jpg" width="180px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo10.jpg" width="180px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo11.jpg" width="180px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo12.jpg" width="180px">
+                    </p>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <p class="next-btn"><a href="#"><img src="./images/btn-next.png" alt="次へ" ></a></p>
+                <p class="prev-btn"><a href="#"><img src="./images/btn-prev.png" alt="前へ" ></a></p>
+              </div>
+            </div>
+
+            <h3>１ページ１枚：カルーセルなし</h3>
+            <div class="js-slider isystkSlider" data-shift="1">
+              <div class="view-layer">
+                <ul class="parent">
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo1.jpg" width="565px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo2.jpg" width="565px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo3.jpg" width="565px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo4.jpg" width="565px">
+                    </p>
+                  </li>
+                  <li class="child">
+                    <p>
+                      <img src="./images/photo5.jpg" width="565px">
+                    </p>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <ul class="paging">
+                  <li class="active" data-pageno="1">
+                    <p>
+                      <img src="./images/photo1.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li data-pageno="2">
+                    <p>
+                      <img src="./images/photo2.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li data-pageno="3">
+                    <p>
+                      <img src="./images/photo3.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li data-pageno="4">
+                    <p>
+                      <img src="./images/photo4.jpg" width="103px">
+                    </p>
+                  </li>
+                  <li data-pageno="5">
+                    <p>
+                      <img src="./images/photo5.jpg" width="103px">
+                    </p>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <h3>スマホ向け：カルーセルあり、スワイプ可</h3>
+            <div class="js-slider isystkSlider" data-shift="1" data-carousel="true" data-swipe="true">
+              <div class="view-layer">
+                <ul class="parent">
+                  <li class="child">
+                    <img src="./images/photo1.jpg" width="307px">
+                  </li>
+                  <li class="child">
+                    <img src="./images/photo2.jpg" width="307px">
+                  </li>
+                  <li class="child">
+                    <img src="./images/photo3.jpg" width="307px">
+                  </li>
+                  <li class="child">
+                    <img src="./images/photo4.jpg" width="307px">
+                  </li>
+                  <li class="child">
+                    <img src="./images/photo5.jpg" width="307px">
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <h2 id="usage">使い方</h2>
+            <p>用途に応じて以下のようなオプションが用意されています。必要に応じて使い分けてください。</p>
+            <h4>オプション一覧</h4>
+            <ul class="point">
+              <li>parentKey(default:ul) ・・・ 親要素</li>
+              <li>childKey(default:li) ・・・ 子要素</li>
+              <li>shift(default:1) ・・・ 1ページでスライドさせる子要素の数</li>
+              <li>dispCount(default:null) ・・・ 1ページに表示する子要素の数(shiftで指定した値と異なる場合にのみ指定する。例：1ページ5要素表示するがスライドは1要素づ合など)</li>
+              <li>shiftw(default:null) ・・・ 1ページでにスライドさせる幅(子要素にmarginなどの余白が指定されている場合に、自動で幅が算出できないためこれを指定する。)</li>
+              <li>animateType(default:ANIMATE_TYPE.SLIDE) ・・・ アニメーションの種類（なし、スライド、フェード）</li>
+              <li>slideSpeed(default:300) ・・・ スライド速度</li>
+              <li>carousel(default:false) ・・・ 1ページ目または、最終ページに到達した場合に、ローテートさせるかどうか</li>
+              <li>prevBtnKey(default:.prev-btn) ・・・ 次ページボタンのセレクタ</li>
+              <li>nextBtnKey(default:.next-btn) ・・・ 前ページボタンのセレクタ</li>
+              <li>autoSlide(default:false) ・・・ 自動でスライドさせるどうか</li>
+              <li>autoSlideInterval(default: 5000) ・・・ 自動でスライドさせる間隔(ミリ秒)</li>
+              <li>hoverPause(default: false) ・・・ 子要素上にマウスオーバーすると自動スライドを一時停止する。</li>
+              <li>isMouseDrag(default:false) ・・・ スワイプでのページングを可能にするかどうか</li>
+              <li>reboundw(default:50) ・・・ スワイプ時に跳ね返りを行う幅</li>
+              <li>moment(default:false) ・・・ スワイプ時に慣性を利用するかどうか</li>
+              <li>isFullScreen(default:false) ・・・ 画面横幅いっぱいに画像を表示するかどうか</li>
+              <li>margin(default:0) ・・・ 子要素間のマージン(isFullScreenで画面横幅いっぱいに表示した場合で子要素間にマージンが設定されている場合に利用する)</li>
+              <li>heightMaxScreen(default:false) ・・・ 画像縦幅が画面縦幅よりも大きい場合は画面縦幅いっぱいに表示する</li>
+              <li>slideCallBack(default:null) ・・・ スライド後に処理を行うコールバック(本プラグインで想定していない処理はこれを利用してカスタマイズする)</li>
+              <li>resizeCallBack(default:null) ・・・ 画面リサイズ（または回転）後に処理を行うコールバック</li>
+            </ul>
+            <h4>Javascript</h4>
+            <pre class="code">
+&lt;script src="https://demo.isystk.com/jquery-isystkOverlay/js/jquery-isystkSlider.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript"&gt;
+$(function() {
+	$('.js-slider').each(function() {
+		var self = $(this),
+			shift = self.data('shift'),
+			carousel = self.data('carousel'),
+			autoSlide = self.data('auto-slide'),
+			swipe = self.data('swipe');
+
+		if (swipe) {
+			self.find('.view-layer').css({
+				'width': '307px'
+			});
+		}
+
+		var slider = self.isystkSlider({
+			'parentKey': '.parent',
+			'childKey': '.child',
+			'shift': shift,
+			'carousel': carousel,
+			'isMouseDrag': swipe,
+			'autoSlide': autoSlide,
+			'prevBtnKey': self.find('.prev-btn'),
+			'nextBtnKey': self.find('.next-btn'),
+			'slideCallBack': function(data) {
+				slider.find('.paging li').removeClass('active');
+				slider.find('.paging li:eq('+(data.pageNo-1)+')').addClass('active');
+			}
+		});
+		slider.find('.paging li').click(function(e) {
+			e.preventDefault();
+			slider.changePage($(this).data('pageno'), $.fn.isystkSlider.ANIMATE_TYPE.SLIDE);
+		});
+		// ページングボタンがある場合は左にマージンを追加
+		if (0 &lt; self.find('.prev-btn').length) {
+			self.find('.view-layer').css({
+				'margin-left': '36px'
+			});
+		}
+	});
+});
+&lt;/script&gt;
+</pre>
+            <h4>Css</h4>
+            <pre class="code">
+.isystkSlider {
+position: relative;
+width: 650px;
+}
+.isystkSlider .view-layer {
+overflow: hidden;
+width: 578px;
+}
+.isystkSlider ul.parent{
+margin-bottom:10px;
+}
+.isystkSlider li.child{
+float:left;
+}
+.isystkSlider li.child p{
+margin:0 5px 0 0;
+border:solid 1px #dedede;
+background:#fff;
+padding:3px;
+}
+.isystkSlider img{
+vertical-align: middle;
+}
+.isystkSlider .prev-btn,
+.isystkSlider .next-btn{
+position: absolute;
+top: 50%;
+margin-top: -1em;
+width: 30px;
+}
+.isystkSlider .prev-btn img,
+.isystkSlider .next-btn img{
+width: 30px;
+}
+.isystkSlider .next-btn{
+right: 0;
+}
+.isystkSlider .paging {
+display: flex;
+justify-content: space-around;
+padding: 0;
+margin: 6px;
+width: 565px;
+}
+.isystkSlider .paging p{
+margin:0 5px 0 0;
+border:solid 1px #dedede;
+background:#fff;
+padding:3px;
+}
+.isystkSlider .paging.dot {
+width: 24%;
+margin: 5px auto;
+}
+.isystkSlider .paging.dot li {
+border: 1px solid #666;
+border-radius: 50%;
+width: 7px;
+height: 7px;
+list-style-type: none;
+}
+.isystkSlider .paging.dot li.active {
+background: #666;
+}
+</pre>
+            <h2 id="source">ソースコード</h2>
+            <a href="https://github.com/isystk/jquery-isystkSlider">https://github.com/isystk/jquery-isystkSlider</a>
+            
+          </div>
+        </article>
+      </main>
+      <aside class="side-left">
+        <div id="sticky-navigator">
+        </div>
+      </aside>
+    </div>
+  </div>
+<script type="text/javascript" src="js/index.js"></script></body>
 </html>
