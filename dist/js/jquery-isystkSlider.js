@@ -65,8 +65,8 @@
 			screen = $(obj);
 			ul = screen.find(params.parentKey);
 			li = ul.find(params.childKey);
-			back = $(params.prevBtnKey);
-			next = $(params.nextBtnKey);
+			back = screen.find(params.prevBtnKey);
+			next = screen.find(params.nextBtnKey);
 			dispCount = params.dispCount || params.shift;
 			childKey = params.childKey;
 			animateType = params.animateType;
