@@ -657,8 +657,10 @@
 				shiftw = (liwidth + margin) * shift;
 				ul.css('width', shiftw * li.length / shift);
 
-				pos = li.length/2;
-				ul.css('left', '-' + (liwidth*(li.length)) + 'px');
+				if (1 < maxPageNo) {
+					pos = li.length/2;
+					ul.css('left', '-' + (liwidth*(li.length)) + 'px');
+				}
 			};
 			var resizeCallBack = function() {
 				if (resizeCallBackFunc) {
