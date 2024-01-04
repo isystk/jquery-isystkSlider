@@ -412,6 +412,11 @@ li {
     list-style-type: none;
 }
 
+.main {
+    width: 100%;
+    overflow: hidden;
+}
+
 .row {
     display: flex;
 }
