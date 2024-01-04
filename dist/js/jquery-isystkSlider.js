@@ -655,20 +655,15 @@
 			// ピンチアウトでリサイズした画像を元の状態に戻す。
 			var resetImage = this.resetImage = function() {
 
-				ul.find('.childKey').each(function() {
+				ul.find(childKey).each(function() {
 
 					var target = $(this),
 						img = target.find('img');
 
-					// 動画は対象外
-					if (target.find('.targetMovie').length !== 0) {
-						return;
-					}
-
 					img.css('position', '');
 					img.css('top', '');
 					img.css('left', '');
-					img.closest('.childKey').css('text-align', 'center');
+					img.closest(childKey).css('text-align', 'center');
 
 					img.css({
 						'transform-origin': '',
@@ -709,7 +704,7 @@
 
 			this.init = function() {
 
-				ul.find('.childKey').each(function() {
+				ul.find(childKey).each(function() {
 
 					var target = $(this),
 						img = target.find('img'),
@@ -726,9 +721,6 @@
 					if (target.find('.targetMovie').length !== 0) {
 						return;
 					}
-
-					// デバック用 TODO 何故かCloneしたLIには表示されない。
-//					target.append( $('<div class="debugText">☆</div>').css('position', 'relative').css('background-color', '#ffffff').css('width', '100px'));
 
 					target.css('overflow', 'hidden');
 					var touchstart_bar = 0;
@@ -772,7 +764,7 @@
 										img.css('position', 'fixed');
 										img.css('top', (($(window).height() - initHeight) / 2) + 'px');
 										img.css('left', (($(window).width() - initWidth) / 2) + 'px');
-										img.closest('.childKey').css('text-align', '');
+										img.closest(childKey).css('text-align', '');
 
 										if (1 < zoom) {
 											moveX=0;
@@ -797,7 +789,7 @@
 												img.css('position', '');
 												img.css('top', '');
 												img.css('left', '');
-												img.closest('.childKey').css('text-align', 'center');
+												img.closest(childKey).css('text-align', 'center');
 											}, 150 ) ;
 										}
 
@@ -818,7 +810,7 @@
 								img.css('position', 'fixed');
 								img.css('top', (($(window).height() - initHeight) / 2) + 'px');
 								img.css('left', (($(window).width() - initWidth) / 2) + 'px');
-								img.closest('.childKey').css('text-align', '');
+								img.closest(childKey).css('text-align', '');
 
 								multiTap = true;
 								pinchOutLoading = true;
@@ -879,11 +871,7 @@
 										'-moz-transform-origin':  posPerX + '% ' + posPerY + '%',
 										'-ms-transform-origin':  posPerX + '% ' + posPerY + '%'
 									});
-
-//										target.find('.debugText').text('posPerX:' + posPerX + '/posPerY:' + posPerY);
-
 								}
-
 							}
 
 							pageX1= e.touches[0].pageX;
@@ -895,7 +883,6 @@
 
 						},false);
 					}
-
 
 					if (!target.hasClass('bind_touchmove')) {
 						target.addClass('bind_touchmove');
@@ -910,7 +897,6 @@
 							if(!multiTap){
 
 								//1本指だったら移動
-
 								var x = (pageX1 - e.touches[0].pageX);
 								var y = (pageY1 - e.touches[0].pageY);
 
@@ -1137,7 +1123,7 @@
 									img.css('position', '');
 									img.css('top', '');
 									img.css('left', '');
-									img.closest('.childKey').css('text-align', 'center');
+									img.closest(childKey).css('text-align', 'center');
 									pinchOutLoading = false;
 								}, 150 ) ;
 							}
