@@ -1,0 +1,95 @@
+@charset "UTF-8";
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 10px 0;
+}
+
+li {
+    list-style-type: none;
+}
+
+.row {
+    display: flex;
+}
+
+.col {
+    width: 20%;
+}
+
+/* 画像スライダー */
+.isystk-slider {
+    position: relative;
+}
+
+.isystk-slider .view-layer {
+    width: 800px;
+    overflow: hidden;
+}
+.isystk-slider .view-layer-responsive {
+    width: 100%;
+    overflow: hidden;
+}
+
+.isystk-slider ul.parent {
+    margin-bottom: 10px;
+}
+
+.isystk-slider li.child {
+    float: left;
+    margin: 0 5px;
+}
+
+.isystk-slider .page-no {
+    text-align: center;
+    font-size: 0.9em;
+    margin: 5px 0;
+}
+
+/** ページング（ボタン） */
+.isystk-slider .prev-btn,
+.isystk-slider .next-btn {
+    position: absolute;
+    top: 50%;
+    margin-top: -2em;
+    width: 30px;
+}
+
+.isystk-slider .prev-btn img,
+.isystk-slider .next-btn img {
+    width: 30px;
+}
+
+.isystk-slider .next-btn {
+    right: 0;
+}
+
+/** ページング（ドット） */
+.isystk-slider .paging {
+    display: flex;
+    justify-content: space-around;
+    padding: 0;
+    margin: 6px;
+    cursor: pointer;
+}
+
+.isystk-slider .paging.dot {
+    width: 24%;
+    margin: 15px auto;
+}
+
+.isystk-slider .paging.dot li {
+    border: 1px solid #666;
+    border-radius: 50%;
+    width: 7px;
+    height: 7px;
+    list-style-type: none;
+}
+
+.isystk-slider .paging.dot li.active {
+    background: #666;
+}
