@@ -31,6 +31,9 @@ li {
     position: relative;
 }
 
+.isystk-slider .view-layer-vertical {
+    height: 584px;
+}
 .isystk-slider .view-layer {
     width: 800px;
 }

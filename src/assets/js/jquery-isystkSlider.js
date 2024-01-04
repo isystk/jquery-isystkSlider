@@ -91,7 +91,10 @@
 
 				// cssを調整する
 				ul.css('position', 'relative');
-				if (!vertical) {
+				if (vertical) {
+					// 縦方向スライドの場合
+					ul.parent().css('overflow-y', 'hidden');
+				} else {
 					// 横方向スライドの場合
 					// li.css('float', 'left');
 					ul.css('display', 'flex');
@@ -391,6 +394,7 @@
 				shiftw = liwidth * shift;
 				if (vertical) {
 					ul.css('height', shiftw * li.length / shift);
+					ul.parent().css('height', shiftw);
 				} else {
 					ul.css('width', shiftw * li.length / shift);
 				}
