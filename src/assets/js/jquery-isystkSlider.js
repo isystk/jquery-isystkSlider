@@ -89,6 +89,15 @@
 					return;
 				}
 
+				// cssを調整する
+				ul.css('position', 'relative');
+				if (!vertical) {
+					// 横方向スライドの場合
+					// li.css('float', 'left');
+					ul.css('display', 'flex');
+					ul.parent().css('overflow-x', 'hidden');
+				}
+				
 				// レスポンシブ表示
 				responsiveEvent();
 				
@@ -116,16 +125,13 @@
 					pos = shift;
 				}
 				
-				// ページングボタンの表示制御
-				showArrows();
-
-				// cssを調整する
-				ul.css('position', 'relative');
 				if (!vertical) {
 					// 横方向スライドの場合
 					ul.css('width', shiftw * li.length / shift)
-					li.css('float', 'left');
 				}
+
+				// ページングボタンの表示制御
+				showArrows();
 
 				// 各種イベントの設定
 				bindEvent();
@@ -374,7 +380,7 @@
 
 				// 子要素の横幅を端末のwidthに設定
 				const margin = ul.find(childKey).outerWidth(true) - ul.find(childKey).width();
-				ul.find(childKey).width($(window).width()-margin);
+				ul.find(childKey).css('min-width', $(window).width()-margin);
 				
 				if (vertical) {
 					liwidth = ul.find(childKey).outerHeight(true);

@@ -432,7 +432,6 @@ li {
 
 .isystk-slider .view-layer {
     width: 800px;
-    overflow: hidden;
 }
 .isystk-slider .view-layer-responsive {
     width: 100%;
@@ -444,7 +443,6 @@ li {
 }
 
 .isystk-slider li.child {
-    float: left;
     margin: 0 5px;
 }
 
