@@ -46,6 +46,13 @@ $(function() {
 		});
 	});
 
+	// 拡大画像スライダー
+	$('.zoom-slider').each(function() {
+		$(this).zoomSlider({
+			'targetClass': '.zoom',
+		});
+	});
+	
 });
 
 

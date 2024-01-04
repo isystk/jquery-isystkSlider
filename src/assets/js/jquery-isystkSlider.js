@@ -21,7 +21,7 @@
 	 * });
 	 * slider1.find('.changePage').click(function(e) {
 	 * 	e.preventDefault();
-	 * 	slider1.changePage($(this).data('page-no'), $.fn.isystkSlider.ANIMATE_TYPE.SLIDE);
+	 * 	slider1.changePage($(this).data('page-no'));
 	 * });
 	 * 
 	 */
@@ -153,7 +153,7 @@
 			}
 
 			// ボタンクリックでのページングを可能にする
-			bindPagingEvent();
+			pagingEvent();
 
 			// 自動でのページングを可能にする
 			if (isAutoSlide) {
@@ -167,9 +167,9 @@
 
 			if (zoom) {
 				// ピンチアウト中の場合はリセットする。
-				pinchOut.resetImage();
+				zoomImage.resetImage();
 				// ピンチアウトによる画像の拡大・縮小を可能にする。
-				pinchOut.init();
+				zoomImage.init();
 			}
 			
 			if (maxPageNo <= 1) {
@@ -237,7 +237,7 @@
 				slideAfter();
 			} else if (animateType === ANIMATE_TYPE.SLIDE) {
 				// スライドで画像を切り替える。（Androidで負荷が大きいため、jQueryのアニメーションは利用しない)
-				(function() {
+				(() => {
 					const elem = ul[0];
 					const begin = +new Date();
 					const duration = slideSpeed;
@@ -283,7 +283,7 @@
 		};
 
 		// ページングボタンの表示制御
-		const showArrows = function() {
+		const showArrows = () => {
 			if (carousel) {
 				// カルーセルが有効な場合は何もしない
 				return;
@@ -310,7 +310,7 @@
 		};
 
 		// カルーセル用に両端に番兵を作成する
-		const initCarousel = function() {
+		const initCarousel = () => {
 
 			// 最終ページに空きが出来る場合は空のLIダグを追加する。例）｜○○○｜○○○｜○○○｜○  ｜
 			const addSize = li.length%shift;
@@ -339,7 +339,7 @@
 		};
 
 		// カルーセル
-		const doCarousel = function() {
+		const doCarousel = () => {
 			const direction = vertical ? 'top' : 'left';
 			// 左端
 			if (pos <= 0) {
@@ -353,7 +353,7 @@
 		};
 
 		// ボタンクリックでのページングを可能にする
-		const bindPagingEvent = function() {
+		const pagingEvent = () => {
 			// 左方向へスライドする
 			back.click(function(e) {
 				e.preventDefault();
@@ -368,7 +368,7 @@
 		};
 		
 		// レスポンシブで表示する
-		const responsiveEvent = function() {
+		const responsiveEvent = () => {
 			if (!responsive) {
 				// レスポンシブが有効になっていない場合は何もしない。
 				return;
@@ -378,7 +378,7 @@
 
 				// ピンチアウト中の場合はリセットする。
 				if (zoom) {
-					pinchOut.resetImage();
+					zoomImage.resetImage();
 				}
 
 				// 子要素の横幅を端末のwidthに設定
@@ -404,7 +404,6 @@
 					pos = li.length/3;
 					ul.css(direction, '-' + (liwidth*(li.length/3*2)) + 'px');
 
-					// リサイズ時は、コールバックは呼ばない。
 					const workPageNo = pageNo;
 					pageNo = 1;
 					changePage(workPageNo);
@@ -423,7 +422,7 @@
 		}
 		
 		// スワイプでのページングを可能にする
-		const swipeEvent = function() {
+		const swipeEvent = () => {
 			const isTouch = ('ontouchstart' in window);
 			// 慣性を利用するかどうか
 			ul.bind({
@@ -643,31 +642,27 @@
 		};
 
 		// 画像のピンチアウトによる拡大・縮小を可能にする
-		var pinchOut = this.pinchOut= new (function() {
+		const zoomImage = this.zoomImage= new (function () {
 
-			var initZoom = 1;
-			var moveX = 0;
-			var moveY = 0;
-			var zoom = 1;
-			var zoomUpRate = 1;
-			var zoomDownRate = 1;
-			var beforeMoveX = 0;
-			var beforeMoveY = 0;
-			var beforeZoom = 1;
-			var pinchOutLoading = false; // ピンチアウト中どうか
-			var pinchOutLeftMax = false; // ピンチアウトにて左端を表示中
-			var pinchOutRightMax = false; // ピンチアウトにて右端を表示中
-
-			var isPinchOutLoading = this.isPinchOutLoading = function() {
-				return pinchOutLoading;
-			}
+			let initZoom = 1;
+			let moveX = 0;
+			let moveY = 0;
+			let zoom = 1;
+			let zoomUpRate = 1;
+			let zoomDownRate = 1;
+			let beforeMoveX = 0;
+			let beforeMoveY = 0;
+			let beforeZoom = 1;
+			let zoomImageLoading = false; // ピンチアウト中どうか
+			let zoomImageLeftMax = false; // ピンチアウトにて左端を表示中
+			let zoomImageRightMax = false; // ピンチアウトにて右端を表示中
 
 			// ピンチアウトでリサイズした画像を元の状態に戻す。
-			var resetImage = this.resetImage = function() {
+			const resetImage = this.resetImage = function() {
 
 				ul.find(childKey).each(function() {
 
-					var target = $(this),
+					const target = $(this),
 						img = target.find('img');
 
 					img.css('position', '');
@@ -694,7 +689,7 @@
 						'-ms-transform': ''
 					});
 
-					img.removeClass('js-pinchOut');
+					img.removeClass('js-zoomImage');
 
 				});
 
@@ -707,16 +702,16 @@
 				beforeMoveX = 0;
 				beforeMoveY = 0;
 				beforeZoom = 1;
-				pinchOutLoading = false;
-				pinchOutLeftMax = false;
-				pinchOutRightMax = false;
+				zoomImageLoading = false;
+				zoomImageLeftMax = false;
+				zoomImageRightMax = false;
 			};
 
 			this.init = function() {
 
 				ul.find(childKey).each(function() {
 
-					var target = $(this),
+					let target = $(this),
 						img = target.find('img'),
 						owidth = parseInt(img.attr('owidth'), 10),
 						oheight = parseInt(img.attr('oheight'), 10),
@@ -733,11 +728,11 @@
 					}
 
 					target.css('overflow', 'hidden');
-					var touchstart_bar = 0;
-					var multiTap = false; // 指2本でタップしているかどうか
-					var doubleTap = false; // ダブルクリックしているかどうか
-					var nowMoving = false;
-					var tapCount = 0 ;
+					let touchstart_bar = 0;
+					let multiTap = false; // 指2本でタップしているかどうか
+					let doubleTap = false; // ダブルクリックしているかどうか
+					let nowMoving = false;
+					let tapCount = 0 ;
 
 					if (!target.hasClass('bind_touchstart')) {
 						target.addClass('bind_touchstart');
@@ -745,11 +740,11 @@
 						//タッチの場合
 						target[0].addEventListener('touchstart',function(e){
 
-							if (!img.hasClass('js-pinchOut')) {
+							if (!img.hasClass('js-zoomImage')) {
 								initWidth = img.width();
 								initHeight = img.height();
 							}
-							img.addClass('js-pinchOut');
+							img.addClass('js-zoomImage');
 
 							if(e.touches.length === 1){
 
@@ -780,7 +775,7 @@
 											moveX=0;
 											moveY=0;
 											zoom = 1;
-											pinchOutLoading = false;
+											zoomImageLoading = false;
 										} else {
 											// 縦長かどうか
 											var isVertical = ($(window).width() < $(window).height());
@@ -789,7 +784,7 @@
 											} else {
 												zoom = $(window).width() / initWidth;
 											}
-											pinchOutLoading = true;
+											zoomImageLoading = true;
 										}
 
 										imageTransform(img, {initZoom: initZoom, moveX:moveX, moveY:moveY, zoom: zoom}, true)
@@ -823,7 +818,7 @@
 								img.closest(childKey).css('text-align', '');
 
 								multiTap = true;
-								pinchOutLoading = true;
+								zoomImageLoading = true;
 								nowLoading = false;
 								initZoom = zoom;
 
@@ -900,7 +895,7 @@
 						//ムーブの場合
 						target[0].addEventListener('touchmove', function(e) {
 
-							if (!pinchOutLoading) {
+							if (!zoomImageLoading) {
 								return;
 							}
 
@@ -915,7 +910,7 @@
 								var nowHeight = Math.floor(initHeight * zoom);
 
 								var isSlideMove = false;
-								if (pinchOutLoading && !(pinchOutLeftMax && ((nowWidth - $(window).width()) / 2) < moveX) && !(pinchOutRightMax && moveX < (-1 * (nowWidth - $(window).width()) / 2))) {
+								if (zoomImageLoading && !(zoomImageLeftMax && ((nowWidth - $(window).width()) / 2) < moveX) && !(zoomImageRightMax && moveX < (-1 * (nowWidth - $(window).width()) / 2))) {
 									event.preventDefault();
 									event.stopPropagation();
 								} else {
@@ -942,7 +937,7 @@
 
 							} else {
 
-								if (pinchOutLoading) {
+								if (zoomImageLoading) {
 									event.preventDefault();
 									event.stopPropagation();
 								}
@@ -1024,8 +1019,8 @@
 							var nowWidth = Math.floor(initWidth * zoom);
 							var nowHeight = Math.floor(initHeight * zoom);
 
-							pinchOutLeftMax = false;
-							pinchOutRightMax = false;
+							zoomImageLeftMax = false;
+							zoomImageRightMax = false;
 
 							// 縦長かどうか
 							var isVertical = ($(window).width() < $(window).height());
@@ -1035,15 +1030,15 @@
 								// 画面から画像がはみ出した際のリバウンド処理
 								if (zoom === 1) {
 									// スライダー可能にする。
-									pinchOutLeftMax = true;
-									pinchOutRightMax = true;
+									zoomImageLeftMax = true;
+									zoomImageRightMax = true;
 								} else  if (((nowWidth - $(window).width()) / 2) < moveX) {
 									// 画面左にはみ出した場合
 
 									moveX = ((nowWidth - $(window).width()) / 2);
 
 									// スライダー可能にする。
-									pinchOutLeftMax = true;
+									zoomImageLeftMax = true;
 
 								} else if (moveX < (-1 * (nowWidth - $(window).width()) / 2)) {
 									// 画面右にはみ出した場合
@@ -1051,7 +1046,7 @@
 									moveX = (-1 * (nowWidth - $(window).width()) / 2);
 
 									// スライダー可能にする。
-									pinchOutRightMax = true;
+									zoomImageRightMax = true;
 
 								} else if ($(window).height() < nowHeight) {
 									// 画面上下にはみ出した場合
@@ -1081,16 +1076,16 @@
 									zoom = 1;
 									moveX = 0;
 									moveY = 0;
-									pinchOutLeftMax = true;
-									pinchOutRightMax = true;
+									zoomImageLeftMax = true;
+									zoomImageRightMax = true;
 								}
 
 
 							} else {
 
 								// スライダー可能にする。
-								pinchOutLeftMax = true;
-								pinchOutRightMax = true;
+								zoomImageLeftMax = true;
+								zoomImageRightMax = true;
 
 								// 画面から画像がはみ出した際のリバウンド処理
 								if (((nowHeight - $(window).height()) / 2) < moveY) {
@@ -1134,7 +1129,7 @@
 									img.css('top', '');
 									img.css('left', '');
 									img.closest(childKey).css('text-align', 'center');
-									pinchOutLoading = false;
+									zoomImageLoading = false;
 								}, 150 ) ;
 							}
 
@@ -1152,7 +1147,7 @@
 
 			};
 
-			var imageTransform = function(img, obj, isAnimate) {
+			const imageTransform = (img, obj, isAnimate) => {
 
 				if (isAnimate) {
 					img.css({
@@ -1182,7 +1177,7 @@
 		})();
 
 		// 自動スライド
-		const autoSlide = this.autoSlide = new (function() {
+		const autoSlide = this.autoSlide = new (function () {
 			let timer = null;
 			this.on = false;
 			this.init = function() {
@@ -1227,7 +1222,7 @@
 		})();
 
 		// スライド後の後処理
-		const slideAfter = function() {
+		const slideAfter = () => {
 			if (carousel) {
 				doCarousel();
 			}
@@ -1248,7 +1243,7 @@
 		/* Public  */
 
 		// 前ページを表示します。
-		const prevPage = this.prevPage = function(callback) {
+		const prevPage = this.prevPage = () => {
 			if (nowLoading) {
 				return;
 			}
@@ -1257,33 +1252,28 @@
 				autoSlide.restart();
 			}
 			slide(-1, animateType);
-			if (callback) {
-				callback();
-			}
 		}
 
 		// 次ページを表示します。
-		const nextPage = this.nextPage = function(callback) {
+		const nextPage = this.nextPage = () => {
 			if (nowLoading) {
 				return;
 			}
-			// 自動スライドのタイマーをリセットする。
 			if (autoSlide.on) {
+				// 自動スライドのタイマーをリセットする。
 				autoSlide.restart();
 			}
 			slide(1, animateType);
-			if (callback) {
-				callback();
-			}
 		}
 
 		// 指定したページを表示します。
-		const changePage = this.changePage = function(page = 1, animateType) {
-			if (maxPageNo < page) {
+		const changePage = this.changePage = (page = 1, animateType) => {
+			if (page < 1 || maxPageNo < page) {
+				// 指定されたページが範囲外の場合は何もしない。
 				return;
 			}
-			// 自動スライドのタイマーをリセットする。
 			if (autoSlide.on) {
+				// 自動スライドのタイマーをリセットする。
 				autoSlide.restart();
 			}
 			// 移動するページ量
@@ -1293,7 +1283,7 @@
 
 		// 最大ページなどの情報をリフレッシュする。（スライドコールバックで次ページ要素をAjax取得してLIに追加した場合などはこれを利用してページ情報を最新化する）
 		// 引数：現在ページ、最大ページ、現在ページの左に追加した要素数
-		const refresh = this.refresh = function (page, max, leftAddCnt) {
+		const refresh = this.refresh = (page, max, leftAddCnt) => {
 			// 子要素をリキャッシュ
 			li = ul.find(params.childKey);
 			if (li.length === 1) {
@@ -1332,7 +1322,7 @@
 		};
 
 		// ボタンクリックやスワイプ時の処理を一次的に停止/開始する。
-		const suspend = this.suspend = function(suspendFlg) {
+		const suspend = this.suspend = (suspendFlg) => {
 			if (!suspendFlg) {
 				nowLoading = false;
 			} else {
