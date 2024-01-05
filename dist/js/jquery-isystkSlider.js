@@ -105,10 +105,12 @@
 				responsiveEvent();
 
 				if (vertical) {
-					liwidth = li.outerHeight(true);
+					const margin = Math.floor((li.outerHeight(true) - li.height()) / 2);
+					liwidth = li.height() + margin;
 				} else {
 					liwidth = li.outerWidth(true);
 				}
+
 				// スライド幅＝子要素横幅✕１ページに含まれる子要素の数
 				shiftw = liwidth * shift;
 				// 最大ページ数＝子要素の数÷１ページに含まれる子要素の数
@@ -128,7 +130,11 @@
 					pos = shift;
 				}
 
-				if (!vertical) {
+				if (vertical) {
+					// 縦方向スライドの場合
+					ul.css('height', shiftw * li.length / shift);
+					ul.parent().css('height', shiftw);
+				} else {
 					// 横方向スライドの場合
 					ul.css('width', shiftw * li.length / shift)
 				}
@@ -384,20 +390,6 @@
 				// 子要素の横幅を端末のwidthに設定
 				const margin = ul.find(childKey).outerWidth(true) - ul.find(childKey).width();
 				ul.find(childKey).css('min-width', $(window).width()-margin);
-
-				if (vertical) {
-					liwidth = ul.find(childKey).outerHeight(true);
-				} else {
-					liwidth = ul.find(childKey).outerWidth(true);
-				}
-
-				shiftw = liwidth * shift;
-				if (vertical) {
-					ul.css('height', shiftw * li.length / shift);
-					ul.parent().css('height', shiftw);
-				} else {
-					ul.css('width', shiftw * li.length / shift);
-				}
 
 				if (carousel && 1 < maxPageNo) {
 					const direction = vertical ? 'top' : 'left';
@@ -1288,7 +1280,7 @@
 			li = ul.find(params.childKey);
 			if (li.length === 1) {
 				// スライド幅＝子要素横幅✕１ページに表示する子要素の数
-				liwidth = li.width();
+				liwidth = li.outerWidth(true);
 				shiftw = liwidth * shift;
 			}
 			// 親要素のwidthを再計算
