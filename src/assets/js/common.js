@@ -8,7 +8,6 @@ $(function() {
 			autoSlide = self.data('auto-slide'),
 			vertical = self.data('vertical'),
 			responsive = self.data('responsive'),
-			zoom = self.data('zoom'),
 			swipe = self.data('swipe');
 		
 		// ページ番号を設定する
@@ -31,7 +30,6 @@ $(function() {
 			swipe,
 			vertical,
 			autoSlide,
-			zoom,
 			'slideCallBack': function({pageNo, maxPageNo}) {
 				// ページ番号を設定する
 				setPageNo({pageNo, maxPageNo})

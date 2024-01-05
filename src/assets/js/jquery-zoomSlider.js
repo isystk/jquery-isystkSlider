@@ -165,6 +165,7 @@
                     , 'childKey': '.childKey'
                     , 'shift': 1
                     , 'swipe': true
+                    , 'zoom': true
                     , 'responsive': true
                     , 'animateType': $.fn.isystkSlider.ANIMATE_TYPE.SLIDE
                     , 'carousel': true
@@ -180,7 +181,7 @@
                         // 両端の場合はメインフレームに次の子要素を追加する。
                         (function() {
                             if (obj.hasClass('firstArray')) {
-                                var nextPageNo = pageNo - 1;
+                                let nextPageNo = pageNo - 1;
                                 if (nextPageNo < 1) {
                                     nextPageNo = maxPageNo;
                                 }
@@ -390,7 +391,6 @@
     // デフォルト値
     $.fn.zoomSlider.defaults = {
         'targetClass': 'img' // 拡大する画像要素
-        , 'slideSpeed': 300 // スライド速度
         , 'slideCallBack': null // スライド後に処理を行うコールバック(本プラグインで想定していない処理はここでカスタマイズする)
         , 'openCallBack': null // 拡大表示後のコールバック
         , 'arrayCnt': 20 // 初期表示でロードする拡大画像内要素の数

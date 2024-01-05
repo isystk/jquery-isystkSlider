@@ -83,7 +83,7 @@
 			exec();
 
 			function exec() {
-				
+
 				if(screen.hasClass('slider-set-end')) {
 					// 既にスライダー設定済みの場合は何もしない
 					return;
@@ -100,10 +100,10 @@
 					ul.css('display', 'flex');
 					ul.parent().css('overflow-x', 'hidden');
 				}
-				
+
 				// レスポンシブ表示
 				responsiveEvent();
-				
+
 				if (vertical) {
 					liwidth = li.outerHeight(true);
 				} else {
@@ -127,7 +127,7 @@
 				} else {
 					pos = shift;
 				}
-				
+
 				if (!vertical) {
 					// 横方向スライドの場合
 					ul.css('width', shiftw * li.length / shift)
@@ -138,7 +138,7 @@
 
 				// 各種イベントの設定
 				bindEvent();
-				
+
 				// スライダーを設定したよっていうマークを付ける。
 				screen.addClass('slider-set-end');
 			};
@@ -171,7 +171,7 @@
 				// ピンチアウトによる画像の拡大・縮小を可能にする。
 				zoomImage.init();
 			}
-			
+
 			if (maxPageNo <= 1) {
 				// 子要素が１つの場合は何もしない
 				nowLoading = false;
@@ -222,7 +222,7 @@
 			showArrows();
 
 			const direction = vertical ? 'top' : 'left';
-			
+
 			if (animateType === ANIMATE_TYPE.NO) {
 				// アニメーションを利用せずに画像を切り替える。
 				if (1 < maxPageNo && carousel) {
@@ -230,7 +230,7 @@
 				} else {
 					ul.css(direction, '-' + ((pos - shift) * liwidth) + 'px');
 				}
-				
+
 				// スライド後の後処理
 				nowLoading = false;
 				dragw = 0;
@@ -298,7 +298,7 @@
 				return;
 			}
 			// 複数ページある場合
-			
+
 			if (pageNo === 1) {
 				// 左端
 				back.hide();
@@ -330,8 +330,8 @@
 
 			const direction = vertical ? 'top' : 'left';
 			ul
-			.append(li.clone(true).addClass('cloned'))
-			.append(li.clone(true).addClass('cloned'))
+				.append(li.clone(true).addClass('cloned'))
+				.append(li.clone(true).addClass('cloned'))
 				.css(direction, '-' + (liwidth*(li.length)) + 'px');
 
 			// liを再キャッシュ
@@ -345,7 +345,7 @@
 			if (pos <= 0) {
 				pos = (li.length/3);
 				ul.css(direction, '-' + (liwidth*pos) + 'px');
-			// 右端
+				// 右端
 			} else if (li.length/3*2 <= pos) {
 				pos = (li.length/3) + (pos - (li.length/3) * 2);
 				ul.css(direction, '-' + (liwidth*pos) + 'px');
@@ -366,7 +366,7 @@
 				nextPage();
 			});
 		};
-		
+
 		// レスポンシブで表示する
 		const responsiveEvent = () => {
 			if (!responsive) {
@@ -384,13 +384,13 @@
 				// 子要素の横幅を端末のwidthに設定
 				const margin = ul.find(childKey).outerWidth(true) - ul.find(childKey).width();
 				ul.find(childKey).css('min-width', $(window).width()-margin);
-				
+
 				if (vertical) {
 					liwidth = ul.find(childKey).outerHeight(true);
 				} else {
 					liwidth = ul.find(childKey).outerWidth(true);
 				}
-				
+
 				shiftw = liwidth * shift;
 				if (vertical) {
 					ul.css('height', shiftw * li.length / shift);
@@ -420,7 +420,7 @@
 			});
 			changeDisplay();
 		}
-		
+
 		// スワイプでのページングを可能にする
 		const swipeEvent = () => {
 			const isTouch = ('ontouchstart' in window);
@@ -453,7 +453,7 @@
 					}
 					this.startTop = this.top;
 					this.startLeft = this.left;
-					
+
 					this.touched = true;
 
 				},
@@ -481,7 +481,7 @@
 					if (!carousel) {
 						if (vertical) {
 							// 縦方向スライドの場合
-							
+
 							// １ページ目は右にスワイプさせない。
 							if (0 < (this.top - y)) {
 								return;
@@ -492,7 +492,7 @@
 							}
 						} else {
 							// 横方向スライドの場合
-							
+
 							// １ページ目は右にスワイプさせない。
 							if (0 < (this.left - x)) {
 								return;
@@ -554,7 +554,7 @@
 									pageNo = 1;
 									slide(0, ANIMATE_TYPE.NO);
 									return;
-								// 右端
+									// 右端
 								} else if (li.length <= pos) {
 									const range = pos - li.length;
 									pos = (li.length/2) + range;
@@ -636,7 +636,7 @@
 
 					const movew = self[startDirection] - self[direction];
 					restMove(movew);
-				    
+
 				}
 			});
 		};
@@ -1239,7 +1239,7 @@
 				slideCallBackFunc(data);
 			}
 		};
-		
+
 		/* Public  */
 
 		// 前ページを表示します。
@@ -1347,7 +1347,7 @@
 
 	// デフォルト値
 	$.fn.isystkSlider.defaults = {
-			'parentKey': 'ul' // 親要素
+		'parentKey': 'ul' // 親要素
 		,	'childKey': 'li' // 子要素
 		,	'responsive': false // 子要素の横幅を画面幅に合わせる
 		,	'vertical': false // 縦方向にスライドさせる
