@@ -25,7 +25,7 @@ jobs:
       - name: Generate Page
         run: |
           npm install
-          npm run generate
+          npm run build
 
       # GitHub Pagesに公開
       # デフォルトではgh-pageeブランチにpushする

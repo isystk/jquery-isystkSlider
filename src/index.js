@@ -1,4 +1,4 @@
-import './assets/index.css';
+import './assets/sass/index.scss';
 
 const $ = require('./assets/js/jquery-3.4.1.min.js');
 window.$ = $;

@@ -1,7 +1,11 @@
 const path = require('path');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CopyFilePlugin = require("copy-webpack-plugin");
+
+// 'production' か 'development' を指定
+const MODE = "development";
+// ソースマップの利用有無(productionのときはソースマップを利用しない)
+const enabledSourceMap = MODE === "development";
 
 module.exports = () => ({
     entry: {
@@ -11,10 +15,10 @@ module.exports = () => ({
         path: path.resolve(__dirname, './dist'),
         filename: `./js/[name].js`,
     },
-    mode: 'development',
+    mode: MODE,
     devServer: {
         static: {
-          directory: path.join(__dirname, "dist"),
+            directory: path.join(__dirname, "dist"),
         },
         compress: true,
         host: '0.0.0.0',
@@ -27,27 +31,15 @@ module.exports = () => ({
                 test: /\.html$/,
                 loader: 'html-loader'
             },
+            // Sassファイルの読み込みとコンパイル
             {
-                test: /\.css$/,
-                use: [
-                    'style-loader', 'css-loader'
-                ]
+                test: /\.(css|scss)$/,
+                use: ["style-loader", "css-loader", "postcss-loader", "sass-loader"],
             },
-            // {
-            //     test: /\.(png|svg|jpg|jpeg|gif)$/,
-            //     use: [
-            //         {
-            //             loader: 'file-loader',
-            //             options: {
-            //                 name: '[name].[ext]',
-            //                 outputPath: 'images/',
-            //                 esModule: false
-            //             }
-            //         }
-            //     ]
-            // }
-        ]
+        ],
     },
+    // ES5(IE11等)向けの指定（webpack 5以上で必要）
+    target: ["web", "es5"],
     plugins: [
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
