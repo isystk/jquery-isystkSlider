@@ -5,8 +5,6 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 // 'production' か 'development' を指定
 const MODE = "development";
-// ソースマップの利用有無(productionのときはソースマップを利用しない)
-const enabledSourceMap = MODE === "development";
 
 module.exports = () => ({
     entry: {
@@ -42,6 +40,19 @@ module.exports = () => ({
                     "sass-loader"
                 ],
             },
+            // {
+            //     //拡張子がpng,jpg,gif,svgを検知したら
+            //     test: /\.(png|jpg|gif|svg)/,
+            //     use: [
+            //         {
+            //             loader: 'file-loader',
+            //             options: {
+            //                 //[name]は画像名、[ext]は拡張子
+            //                 name: 'images/[name].[ext]'
+            //             }
+            //         }
+            //     ]
+            // }
         ],
     },
     // ES5(IE11等)向けの指定（webpack 5以上で必要）

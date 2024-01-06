@@ -18,60 +18,75 @@
         const init = (obj) => {
 
             const screen = $(obj),
-                targetClass = params.targetClass,
-                target = screen.find(targetClass),
-                slideCallBack = params.slideCallBack,
-                maxPageNo = target.length;
+                targetClass = params.targetClass;
+            
+            const targets = screen
+                .find(targetClass)
+                .filter(function () {
+                    // 動画の場合は加工後のDomを除外する
+                    return !$(this).hasClass('js-movie')
+                });
 
             let nowLoading = true;
 
-            if (target.length === 0) {
+            if (targets.length === 0) {
+                // 拡大対象が１つもない場合は何もしない。
                 return;
             }
 
-            const gallery = $('.' + className);
-
-            let index = 1;
-            if (gallery) {
-                index = gallery.length + 1;
-            }
-
-            // target を配列に分割する。
-            const targetArray = [];
-            (function() {
-                let len = Math.floor(target.length / params.arrayCnt);
-                if ((target.length % params.arrayCnt) !== 0) {
-                    len = len + 1;
-                }
-                for(let i=0; i < len; i++) {
-                    const j = i * params.arrayCnt;
-                    const p = target.slice(j, j + params.arrayCnt);
-                    targetArray.push(p);
-                }
-            })();
-
+            /* ギャラリーに設定する画像データ配列を生成する */
+            const targetItems = $.makeArray(targets
+                .map(function() {
+                    let self = $(this);
+                    if (self.hasClass('movieBox')) {
+                        self = self.find('img')
+                    }
+                    const imagePath = self.attr('src') || '';
+                    const caption = self.attr('alt') || '';
+                    return {
+                        imagePath,
+                        caption
+                    }
+                })
+            );
 
             // メインフレームを生成します。
-            const makeFlame =  (index) => {
-
+            const makeFlame =  () => {
+                
                 const mainFlame = $([
                     '<div class="isystk-overlay">',
                         '<a href="#" class="js-close close"></a>',
-                        '<div class="wrap">',
-                            '<div class="js-slider">',
-                                '<div class="view-layer">',
-                                    '<ul class="parentKey">',
-                                    '</ul>',
-                                '</div>',
-                                '<div>',
-                                    '<p><a href="#" class="next-btn"></a></p>',
-                                    '<p><a href="#" class="prev-btn"></a></p>',
+                        '<div class="js-slider" style="overflow:hidden;margin 0 auto;background-color: #000;">',
+							'<ul class="parentKey photo_enlarge_imageArea">',
+							'</ul>',
+						'</div>',
+                        '<div class="photo_enlarge_partsArea">',
+                            '<div class="transitionArea transitionList">',
+                                '<p class="item prev js-backBtn" style="position: absolute; top: 52%; left: 5px; margin-top: -20px;">' +
+                                    '<a href="#"><img src="./assets/images/btn-prev.svg" alt="前へ" /></a>' +
+                                '</p>',
+                                '<p class="item next js-nextBtn" style="position: absolute; top: 52%; right: 5px; margin-top: -20px;">' +
+                                    '<a href="#"><img src="./assets/images/btn-next.svg" alt="次へ" /></a>' +
+                                '</p>',
+                            '</div>',
+                            '<div class="commentArea" style="position: fixed;height: 29%;background: #000;opacity: 0.8;color:#fff;z-index: 10002;box-sizing: border-box;bottom: 0;width: 100%;padding: 10px;">',
+                                '<div class="comment">',
+                                    '<p class="caption_txt captionArea"></p>',
+                                    '<div style="display: flex;justify-content: center;position:relative;">',
+                                        '<p class="count" style="position:absolute;padding: 0 6px;background: #bdaa7d;border-radius: 100px;font-size: 1rem;color: #fff;"></p>',
+                                    '</div>',
                                 '</div>',
                             '</div>',
                         '</div>',
                     '</div>'
                 ].join(''));
 
+                // 生成した拡大パネルに画面内で一意なIDを設定する
+                const gallery = $('.' + className);
+                let index = 1;
+                if (gallery) {
+                    index = gallery.length + 1;
+                }
                 mainFlame.attr('id', 'zoomSlider'+ index);
                 mainFlame.addClass(className);
                 mainFlame.width($(window).width());
@@ -82,44 +97,15 @@
             }
 
             // 子要素を生成します。
-            const makeChild =  (mainFlame, page, callback) => {
-
-                const num = (function findArrayNum(page) {
-                    return Math.floor((page-1) / params.arrayCnt);
-                })(page);
-
-                const photos = [];
-
-                /* ギャラリーに設定する画像データ配列を生成する */
-                for (let i=0, len=mainFlame.targetArray[num].length; i<len; i++) {
-                    const target = $(mainFlame.targetArray[num][i]),
-                        image = target,
-                        imagePath = image.attr('src') || '',
-                        caption = image.attr('alt') || '';
-                    const data = {
-                        imagePath : imagePath,
-                        caption : caption
-                    };
-                    photos.push(data);
-                }
+            const makeChild =  (callback) => {
 
                 // 拡大写真パネルを生成する
-                const li = $(photos.map((data) => {
+                const li = $(targetItems.map((data) => {
                     return [
                         '<li class="childKey">',
-                        '<img src="'+data.imagePath+'" alt="'+data.caption+'" />',
+                            '<img src="'+data.imagePath+'" alt="'+data.caption+'" />',
                         '</li>'].join('');
                 }).join(''));
-                li.attr('array', num);
-                li.each(function(i) {
-                    $(this).attr('pageno', (num*params.arrayCnt) + (i+1));
-                    if (i===0) {
-                        $(this).addClass('firstArray');
-                    }
-                    if (i===(li.length-1)) {
-                        $(this).addClass('lastArray');
-                    }
-                });
                 li.css('text-align', 'center')
                     .css('margin-top', '0px');
 
@@ -127,12 +113,12 @@
                 li.width($(window).width());
                 li.height($(window).height());
 
-                var images = li.find('img');
-                var photoLength = images.length;
+                const images = li.find('img');
+                let photoLength = images.length;
                 images.each(function() {
-                    var photo = $(this),
+                    const photo = $(this),
                         imagePath = photo.attr('src') || '';
-                    var img = $('<img>');
+                    const img = $('<img>');
                     img.on('load',function(){
 
                         photo.attr('owidth', img[0].width);
@@ -163,7 +149,7 @@
             }
 
             // イベントバンドル
-            const bundle = (mainFlame) => {
+            const bindEvents = (mainFlame) => {
 
                 // 画像スライダー
                 const slider = mainFlame.slider = mainFlame.find('.js-slider').isystkSlider({
@@ -175,104 +161,43 @@
                     , 'responsive': true
                     , 'animateType': $.fn.isystkSlider.ANIMATE_TYPE.SLIDE
                     , 'carousel': true
-                    , 'slideCallBack': function(data) {
-
-                        var obj = $(data.obj),
-                            pageNo = parseInt(obj.attr('page-no')),
-                            arrayNo = parseInt(obj.attr('array'));
-
-                        // 画像上下の余白を調整する。
-                        prepareDisplay(pageNo);
-
-                        // 両端の場合はメインフレームに次の子要素を追加する。
-                        (function() {
-                            if (obj.hasClass('firstArray')) {
-                                let nextPageNo = pageNo - 1;
-                                if (nextPageNo < 1) {
-                                    nextPageNo = maxPageNo;
-                                }
-                                if (mainFlame.find('.childKey[page-no="' + nextPageNo + '"]').length === 0) {
-                                    makeChild(mainFlame, nextPageNo, function(li) {
-                                        var nextArrayNo = parseInt(li.attr('array'));
-                                        // LIタグの差し込み位置を算出
-                                        var appendPos = findAppendPos(mainFlame, nextArrayNo);
-                                        insertChild(mainFlame.find('.childKey.lastArray[array="'+appendPos+'"]'), li);
-                                        if (nextArrayNo < arrayNo && obj.hasClass('cloned')) {
-                                            mainFlame.slider.refresh(pageNo, maxPageNo, li.length*2);
-                                        } else {
-                                            mainFlame.slider.refresh(pageNo, maxPageNo, li.length);
-                                        }
-
-                                        // 画像上下の余白を調整する。
-                                        prepareDisplay(pageNo);
-
-                                        nowLoading = false;
-                                    });
-                                }
-                            }
-                            if (obj.hasClass('lastArray')) {
-                                var nextPageNo = pageNo + 1;
-                                if (maxPageNo < nextPageNo) {
-                                    nextPageNo = 1;
-                                }
-                                if (mainFlame.find('.childKey[page-no="' + nextPageNo + '"]').length === 0) {
-                                    makeChild(mainFlame, nextPageNo, function (li) {
-                                        var nextArrayNo = parseInt(li.attr('array'));
-                                        insertChild(mainFlame.find('.childKey.lastArray[array="'+arrayNo+'"]'), li);
-                                        if (arrayNo < nextArrayNo && !obj.hasClass('cloned')) {
-                                            mainFlame.slider.refresh(pageNo, maxPageNo, 0);
-                                        } else {
-                                            mainFlame.slider.refresh(pageNo, maxPageNo, li.length);
-                                        }
-
-                                        // 画像上下の余白を調整する。
-                                        prepareDisplay(pageNo);
-
-                                        nowLoading = false;
-                                    });
-                                }
-                            }
-                        })();
-
+                    , 'slideCallBack': function({obj, pageNo}) {
+                        // キャプションを変更する
+                        changeCaption(pageNo);
                         nowLoading = false;
-                        if (slideCallBack) {
-                            slideCallBack(data);
-                        }
                     }, 'resizeCallBack': function (data) {
-
-                        var obj = $(data.obj),
-                            pageNo = parseInt(obj.attr('page-no'));
-
-                        // 画像上下の余白を調整する。
-                        prepareDisplay(pageNo);
-
                         mainFlame.css('width', $(window).width() + 'px');
                     }
                 });
 
+                // 子要素をタップ時にキャプションの表示/非表示を切り替える。
+                let showPartsArea = true;
+                slider.click(function(e) {
+                    const partsArea = mainFlame.find('.photo_enlarge_partsArea');
+                    const timer = setTimeout(function() {
+                        clearInterval(timer);
+                        if (showPartsArea) {
+                            partsArea.hide();
+                            showPartsArea = false;
+                        } else {
+                            partsArea.show();
+                            showPartsArea = true;
+                        }
+                    } , 200);
+                });
+                
                 // 対象画像クリック時に拡大写真パネルを表示する
-                screen.find(targetClass).each(function(i) {
-                    var target = $(this),
+                targets.css('cursor', 'pointer');
+                targets.each(function(i) {
+                    const target = $(this),
                         pageNo = i+1;
 
-                    target.css('cursor', 'pointer');
                     target.bind('click', function(e) {
                         e.preventDefault();
                         if (nowLoading) {
                             return;
                         }
-                        if (mainFlame.find('.childKey[page-no="' + pageNo + '"]').length === 0) {
-                            makeChild(mainFlame, pageNo, function(li) {
-                                var arrayNo = parseInt(li.attr('array'));
-                                // LIタグの差し込み位置を算出
-                                var appendPos = findAppendPos(mainFlame, arrayNo);
-                                insertChild(mainFlame.find('.childKey.lastArray[array="'+appendPos+'"]'), li);
-                                mainFlame.slider.refresh(null, maxPageNo, li.length);
-                                showPage(pageNo);
-                            });
-                        } else {
-                            showPage(pageNo);
-                        }
+                        showPage(pageNo);
                     });
                 });
 
@@ -283,7 +208,7 @@
                         return;
                     }
                     nowLoading = true;
-                    mainFlame.slider.backPage();
+                    mainFlame.slider.prevPage();
                 });
 
                 // 拡大写真パネルスライダー 次ページクリック時
@@ -295,92 +220,74 @@
                     nowLoading = true;
                     mainFlame.slider.nextPage();
                 });
-
             };
 
-            // 画面表示を調整する。
-            const prepareDisplay = (pageNo) => {
-                mainFlame.slider.find('.childKey[page-no="' +pageNo+'"]').each(function() {
-                    // 余白の調整
-                    appendMargin();
-                });
-            }
+            // 指定したページを表示します。
+            const showPage = (pageNo = 1) => {
+                if (nowLoading) {
+                    return;
+                }
+                mainFlame.slider.changePage(pageNo);
+                // キャプションを変更する
+                changeCaption(pageNo);  
+            };
+            
+            // キャプションを変更します
+            const changeCaption = (pageNo) => {
+                const targetItem = targetItems[pageNo-1];
+                const caption = targetItem.caption || '',
+                    commentArea = mainFlame.find('.commentArea') || '',
+                    captionArea = commentArea.find('.comment .captionArea') || '';
+
+                // キャプション
+                captionArea
+                    .empty()
+                    .text(caption);
+
+                mainFlame.find('.commentArea .count').text(`${pageNo}/${targets.length}`);
+
+                // テキストを表示する
+                mainFlame.find('.photo_enlarge_partsArea').show();
+            };
 
             // 上下左右に余白を追加する。
-            const appendMargin = () => {
+            const appendMargin = (childFlame) => {
                 // 画面上下にマージン設定（画像）
-                mainFlame.slider.find('.childKey img').each(function() {
-                    var photo = $(this),
+                childFlame.each(function() {
+                    const photo = $(this).find('img'),
                         oheight = photo.attr('oheight') || 0,
                         owidth = photo.attr('owidth') || 0;
 
                     photo.closest('.childKey').css('padding-top', '');
 
-                    var x = Math.floor(oheight * $(window).width() / owidth);
-                    var padding = Math.floor(($(window).height() - x) / 2) || 0;
+                    const x = Math.floor(oheight * $(window).width() / owidth);
+                    const padding = Math.floor(($(window).height() - x) / 2) || 0;
                     if (0 < padding) {
                         photo.closest('.childKey').css('padding-top', padding + 'px');
                     } else {
                         photo.closest('.childKey').css('padding-top', '0px');
                     }
-
                 });
             };
 
-            // 次のDOMを追加する位置を算出します。
-            const findAppendPos = (mainFlame, n) => {
-                if(mainFlame.find('.childKey').length === 0) {
-                    return null;
-                }
-                n = n -1;
-                if (n < 0) {
-                    n = mainFlame.targetArray.length -1;
-                }
-                if(mainFlame.find('.childKey[array="'+n+'"]').length === 0) {
-                    return findAppendPos(mainFlame, n);
-                }
-                return n;
-            };
-
-            // beforeDom の後に afterDom を追加します。
-            const insertChild = (beforeDom, afterDom) => {
-                beforeDom.each(function() {
-                    var s = $(this);
-                    var p = afterDom.clone(true);
-                    if (s.hasClass('cloned')) {
-                        p.addClass('cloned');
-                    }
-                    $(s).after(p);
-                });
-            };
-
-            // 指定したページを表示します。
-            const showPage = (pageNo = 1) => {
-
-                if (nowLoading) {
-                    return;
-                }
-
-                // 初期表示時のスクロール位置を保持しておく。
-                defaultScrollTop = $(window).scrollTop();
-
-                mainFlame.slider.changePage(pageNo);
-
-            };
-
-            const mainFlame = makeFlame(index);
-            mainFlame.targetArray = targetArray;
-            makeChild(mainFlame, 1, function(childFlame) {
+            const mainFlame = makeFlame();
+            makeChild(function(childFlame) {
                 mainFlame.find('.parentKey').append(childFlame);
-                bundle(mainFlame);
+
+                // 余白の調整
+                appendMargin(childFlame);
+                
+                bindEvents(mainFlame);
                 nowLoading = false;
             });
 
-            // オーバーレイのクリックイベントを設定
-            target.each(function() {
-                $(this).attr('data-panel', '#' + mainFlame.attr('id'));
-            });
-            target.isystkOverlay();
+            // オーバーレイの設定
+            targets
+                .each(function() {
+                    // 対象をクリックした際に表示する拡大パネルを指定する
+                    $(this).attr('data-panel', '#' + mainFlame.attr('id'));
+                })
+                .isystkOverlay();
 
         };
 

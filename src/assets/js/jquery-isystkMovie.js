@@ -298,10 +298,6 @@
             }
             var playTimeTop = Math.floor(h - (2 * playTimeFontSize));
 
-            console.log({
-                playBtnTop,
-                playBtnLeft
-            })
             movieBox.css('width', w + 'px').css('height', h + 'px');
             movieBox.find('.playBtn').css('top', playBtnTop + 'px').css('left', playBtnLeft + 'px');
             movieBox.find('.playTime').css('top', playTimeTop + 'px').css('font-size', playTimeFontSize + 'px');
