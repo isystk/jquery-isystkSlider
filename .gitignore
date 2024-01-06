@@ -2,7 +2,7 @@
 node_modules
 
 # generate
-#dist
+dist
 
 .DS_Store
 .history

@@ -1,100 +1,60 @@
-const src = __dirname + '/src';
-const dist = __dirname + '/dist/'
-
+const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const CopyFilePlugin = require("copy-webpack-plugin");
-const WriteFilePlugin = require("write-file-webpack-plugin");
 
-const webpackConfig = {
-  context: src,
-  entry: {
-    index: './index.js'
-  },
-  output: {
-    path: dist,
-    filename: 'js/[name].js'
-  },
-  devServer: {
-    contentBase: dist,
-    compress: true,
-    host: '0.0.0.0',
-    useLocalIp: true,
-    port: 3000,
-    open: true,
-  },
-  module: {
-    rules: [
-      {
-        test: /\.html$/,
-        loader: 'html-loader'
-      },
-      {
-        test: /\.css$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader
-          },
-          'css-loader'
+module.exports = () => ({
+    entry: {
+        index: './src/index.js',
+    },
+    output: {
+        path: path.resolve(__dirname, './dist'),
+        filename: `./js/[name].js`,
+    },
+    mode: 'development',
+    devServer: {
+        static: {
+          directory: path.join(__dirname, "dist"),
+        },
+        compress: true,
+        host: '0.0.0.0',
+        port: 3000,
+        open: true,
+    },
+    module: {
+        rules: [
+            {
+                test: /\.html$/,
+                loader: 'html-loader'
+            },
+            {
+                test: /\.css$/,
+                use: [
+                    'style-loader', 'css-loader'
+                ]
+            },
+            // {
+            //     test: /\.(png|svg|jpg|jpeg|gif)$/,
+            //     use: [
+            //         {
+            //             loader: 'file-loader',
+            //             options: {
+            //                 name: '[name].[ext]',
+            //                 outputPath: 'images/',
+            //                 esModule: false
+            //             }
+            //         }
+            //     ]
+            // }
         ]
-      },
-      {
-          test: /\.(jpe?g|png|gif|svg)$/,
-          use: [
-              {
-                  loader: 'file-loader',
-                  options: {
-                      name: '[name].[ext]',
-                      outputPath : 'images/',
-                      publicPath : function(path){
-                          return './images/' + path;
-                      },
-                      esModule: false
-                  }
-              }
-          ]
-      }
+    },
+    plugins: [
+        new CleanWebpackPlugin(),
+        new HtmlWebpackPlugin({
+            inject: 'body',
+            filename: 'index.html',
+            template: './src/index.html',
+            chunks: ['index'],
+        }),
     ]
-  },
-  plugins: [
-    // distの中を初期化する
-    new CleanWebpackPlugin(),
-    new HtmlWebpackPlugin(),
-    new MiniCssExtractPlugin({
-      filename: '[name].css' // Dist
-    }),
-    new CopyFilePlugin(
-      [
-        {
-          context: "assets/js",
-          from: "jquery-isystkSlider.js",
-          to: "js"
-        }
-      ],
-      { copyUnmodified: true }
-    ),
-    new WriteFilePlugin()
-  ],
-  optimization: {
-    minimizer: [
-      new TerserPlugin(), // JavaScript の minify を行う
-      new OptimizeCSSAssetsPlugin() // CSS の minify を行う
-    ]
-  }
-}
-
-Object.keys(webpackConfig.entry).forEach((key) => {
-  webpackConfig.plugins.push(
-    new HtmlWebpackPlugin({
-      template: './assets/'+key+'.html', // Source
-      filename: './'+key+'.html', // Dist
-      inject: true,
-      chunks: [key], // insert to the root of output folder
-    })
-  );
-})
-
-module.exports = webpackConfig;
+});
