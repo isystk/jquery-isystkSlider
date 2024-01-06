@@ -1,0 +1,34 @@
+name: Publish GitHub Pages
+
+# git pushをトリガにワークフローが実行される
+on:
+  push:
+
+# 書き込み権限の付与
+permissions:
+  contents: write
+
+jobs:
+  publish-gh-pages:
+    runs-on:
+      - ubuntu-latest
+
+    steps:
+      # GitHub Pagesに公開するファイルの作成
+      # 実際はGitリポジトリをチェックアウトしてそこからビルドすることが多い
+      - name: Generate Page
+        run: |
+          npm run generate
+
+      # GitHub Pagesに公開
+      # デフォルトではgh-pageeブランチにpushする
+      - name: Push gh-pages branch
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          # Deploy keysやPersonal access Tokensも使用可能
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          # keep_filesをtrueにすると、git pushの度に一旦全てのファイルが削除される挙動を抑制できる
+          # keep_files: true
+          user_name: github-actions
+          user_email: github-actions@github.com
