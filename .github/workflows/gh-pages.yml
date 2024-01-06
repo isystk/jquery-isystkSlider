@@ -24,6 +24,7 @@ jobs:
       # 実際はGitリポジトリをチェックアウトしてそこからビルドすることが多い
       - name: Generate Page
         run: |
+          npm install
           npm run generate
 
       # GitHub Pagesに公開
