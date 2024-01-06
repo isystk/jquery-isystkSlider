@@ -4,7 +4,7 @@ jquery-isystkSlider
 ## Description
 
 ## Demo
-https://demo.isystk.com/jquery-isystkSlider/
+https://isystk.github.io/jquery-isystkSlider/
 
 ## VS. 
 
