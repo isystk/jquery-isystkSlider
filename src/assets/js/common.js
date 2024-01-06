@@ -51,6 +51,9 @@ $(function() {
 		});
 	});
 	
+	// 動画
+	$('img.js-movie').isystkMovie();
+	
 });
 
 
