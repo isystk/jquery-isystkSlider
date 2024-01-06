@@ -10,51 +10,51 @@
 
     $.fn.zoomSlider = function(options) {
 
-        var params = $.extend({}, $.fn.zoomSlider.defaults, options);
+        const params = $.extend({}, $.fn.zoomSlider.defaults, options);
 
-        var className = "zoomSlider";
+        const className = "zoomSlider";
 
         // 初期設定
-        var init = function(obj) {
+        const init = (obj) => {
 
-            var screen = $(obj),
+            const screen = $(obj),
                 targetClass = params.targetClass,
                 target = screen.find(targetClass),
                 slideCallBack = params.slideCallBack,
                 maxPageNo = target.length;
 
-            var nowLoading = true;
+            let nowLoading = true;
 
             if (target.length === 0) {
                 return;
             }
 
-            var gallery = $('.' + className);
+            const gallery = $('.' + className);
 
-            var index = 1;
+            let index = 1;
             if (gallery) {
                 index = gallery.length + 1;
             }
 
             // target を配列に分割する。
-            var targetArray = [];
+            const targetArray = [];
             (function() {
-                var len = Math.floor(target.length / params.arrayCnt);
+                let len = Math.floor(target.length / params.arrayCnt);
                 if ((target.length % params.arrayCnt) !== 0) {
                     len = len + 1;
                 }
-                for(var i=0; i < len; i++) {
-                    var j = i * params.arrayCnt;
-                    var p = target.slice(j, j + params.arrayCnt);
+                for(let i=0; i < len; i++) {
+                    const j = i * params.arrayCnt;
+                    const p = target.slice(j, j + params.arrayCnt);
                     targetArray.push(p);
                 }
             })();
 
 
             // メインフレームを生成します。
-            var makeFlame = function (index) {
+            const makeFlame =  (index) => {
 
-                var mainFlame = $([
+                const mainFlame = $([
                     '<div class="isystk-overlay">',
                         '<a href="#" class="js-close close"></a>',
                         '<div class="wrap">',
@@ -82,21 +82,21 @@
             }
 
             // 子要素を生成します。
-            var makeChild = function (mainFlame, page, callback) {
+            const makeChild =  (mainFlame, page, callback) => {
 
-                var num = (function findArrayNum(page) {
+                const num = (function findArrayNum(page) {
                     return Math.floor((page-1) / params.arrayCnt);
                 })(page);
 
-                var photos = [];
+                const photos = [];
 
                 /* ギャラリーに設定する画像データ配列を生成する */
-                for (var i=0, len=mainFlame.targetArray[num].length; i<len; i++) {
-                    var target = $(mainFlame.targetArray[num][i]),
+                for (let i=0, len=mainFlame.targetArray[num].length; i<len; i++) {
+                    const target = $(mainFlame.targetArray[num][i]),
                         image = target,
                         imagePath = image.attr('src') || '',
                         caption = image.attr('alt') || '';
-                    var data = {
+                    const data = {
                         imagePath : imagePath,
                         caption : caption
                     };
@@ -104,7 +104,7 @@
                 }
 
                 // 拡大写真パネルを生成する
-                var li = $(photos.map(function(data) {
+                const li = $(photos.map((data) => {
                     return [
                         '<li class="childKey">',
                         '<img src="'+data.imagePath+'" alt="'+data.caption+'" />',
@@ -127,9 +127,9 @@
                 li.width($(window).width());
                 li.height($(window).height());
 
-                var photos = li.find('img');
-                var photoLength = photos.length;
-                photos.each(function() {
+                var images = li.find('img');
+                var photoLength = images.length;
+                images.each(function() {
                     var photo = $(this),
                         imagePath = photo.attr('src') || '';
                     var img = $('<img>');
@@ -140,15 +140,21 @@
                         var x = Math.floor(photo.attr('oheight') * $(window).width() / photo.attr('owidth'));
                         var margin = Math.floor(($(window).height() - x) / 2);
                         if (0 <= margin) {
-                            photo.css('height', '').css('width', '100%');
+                            photo
+                                .css('height', '')
+                                .css('width', '100%')
+                            ;
                         } else {
-                            photo.css('height', '100%').css('width', '');
+                            photo
+                                .css('height', '100%')
+                                .css('width', '')
+                                .css('margin', 'auto');
                         }
                         if (photoLength !== 1) {
                             photoLength--;
                             return;
                         }
-                        photos.unbind('load');
+                        images.unbind('load');
 
                         callback(li);
                     });
@@ -157,10 +163,10 @@
             }
 
             // イベントバンドル
-            var bundle = function(mainFlame) {
+            const bundle = (mainFlame) => {
 
                 // 画像スライダー
-                var slider = mainFlame.slider = mainFlame.find('.js-slider').isystkSlider({
+                const slider = mainFlame.slider = mainFlame.find('.js-slider').isystkSlider({
                     'parentKey': '.parentKey'
                     , 'childKey': '.childKey'
                     , 'shift': 1
@@ -293,7 +299,7 @@
             };
 
             // 画面表示を調整する。
-            var prepareDisplay = function(pageNo) {
+            const prepareDisplay = (pageNo) => {
                 mainFlame.slider.find('.childKey[page-no="' +pageNo+'"]').each(function() {
                     // 余白の調整
                     appendMargin();
@@ -301,7 +307,7 @@
             }
 
             // 上下左右に余白を追加する。
-            var appendMargin = function() {
+            const appendMargin = () => {
                 // 画面上下にマージン設定（画像）
                 mainFlame.slider.find('.childKey img').each(function() {
                     var photo = $(this),
@@ -322,7 +328,7 @@
             };
 
             // 次のDOMを追加する位置を算出します。
-            var findAppendPos = function (mainFlame, n) {
+            const findAppendPos = (mainFlame, n) => {
                 if(mainFlame.find('.childKey').length === 0) {
                     return null;
                 }
@@ -337,7 +343,7 @@
             };
 
             // beforeDom の後に afterDom を追加します。
-            var insertChild = function(beforeDom, afterDom) {
+            const insertChild = (beforeDom, afterDom) => {
                 beforeDom.each(function() {
                     var s = $(this);
                     var p = afterDom.clone(true);
@@ -349,13 +355,11 @@
             };
 
             // 指定したページを表示します。
-            var showPage = function(pageNo) {
+            const showPage = (pageNo = 1) => {
 
                 if (nowLoading) {
                     return;
                 }
-
-                var pageNo = pageNo || 1;
 
                 // 初期表示時のスクロール位置を保持しておく。
                 defaultScrollTop = $(window).scrollTop();
@@ -364,7 +368,7 @@
 
             };
 
-            var mainFlame = makeFlame(index);
+            const mainFlame = makeFlame(index);
             mainFlame.targetArray = targetArray;
             makeChild(mainFlame, 1, function(childFlame) {
                 mainFlame.find('.parentKey').append(childFlame);
@@ -393,7 +397,7 @@
         'targetClass': 'img' // 拡大する画像要素
         , 'slideCallBack': null // スライド後に処理を行うコールバック(本プラグインで想定していない処理はここでカスタマイズする)
         , 'openCallBack': null // 拡大表示後のコールバック
-        , 'arrayCnt': 20 // 初期表示でロードする拡大画像内要素の数
+        , 'arrayCnt': 3 // 初期表示でロードする拡大画像内要素の数
     };
 
 })(jQuery);

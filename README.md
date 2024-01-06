@@ -1,38 +1,43 @@
-jquery-isystkSlider
+🌙 jquery-isystkSlider
 ====
 
-## Description
+![GitHub issues](https://img.shields.io/github/issues/isystk/jquery-isystkSlider)
+![GitHub forks](https://img.shields.io/github/forks/isystk/jquery-isystkSlider)
+![GitHub stars](https://img.shields.io/github/stars/isystk/jquery-isystkSlider)
+![GitHub license](https://img.shields.io/github/license/isystk/jquery-isystkSlider)
 
-## Demo
-https://isystk.github.io/jquery-isystkSlider/
+## 📗 プロジェクトの概要
 
-## VS. 
+jQueryで作成した汎用画像スライダーです。
 
-## Requirement
+## 🌐 Demo
 
-## Usage
+#### ■ フロント画面（React）
 
-## Install
+https://isystk.github.io/jquery-isystkSlider
 
-``` bash
-# install
+![デモ](./demo.png "デモ")
+
+## 💬 使い方
+
+各種デーモンを起動する
+```
 $ npm install
-
-# static generate
-$ npm run generate
-
-# server start
 $ npm run dev
-$ open http://localhost:3000/
 ```
 
-## Contribution
+## 🎨 参考
 
-## Licence
+| プロジェクト                                                                                       | 概要                                         |
+|:---------------------------------------------------------------------------------------------|:-------------------------------------------|
+| [Laravel10公式ドキュメント](https://readouble.com/laravel/10.x/ja/releases.html)                     | Laravel10公式ドキュメントです。                       |
 
-[MIT](https://github.com/isystk/jquery-isystkSlider/LICENCE)
 
-## Author
+## 🎫 Licence
+
+[MIT](https://github.com/isystk/jquery-isystkSlider/blob/master/LICENSE)
+
+## 👀 Author
 
 [isystk](https://github.com/isystk)
 
