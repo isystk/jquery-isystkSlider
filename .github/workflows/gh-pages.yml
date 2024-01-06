@@ -1,19 +1,25 @@
-name: Publish GitHub Pages
+name: GitHub Pages
 
-# git pushをトリガにワークフローが実行される
 on:
   push:
+    branches:
+      - master  # Set a branch name to trigger deployment
 
 # 書き込み権限の付与
 permissions:
   contents: write
 
 jobs:
-  publish-gh-pages:
-    runs-on:
-      - ubuntu-latest
-
+  deploy:
+    runs-on: ubuntu-22.04
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
     steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true  # Fetch Hugo themes (true OR recursive)
+          fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
+  
       # GitHub Pagesに公開するファイルの作成
       # 実際はGitリポジトリをチェックアウトしてそこからビルドすることが多い
       - name: Generate Page
@@ -24,11 +30,7 @@ jobs:
       # デフォルトではgh-pageeブランチにpushする
       - name: Push gh-pages branch
         uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.ref == 'refs/heads/master' }}
         with:
-          # Deploy keysやPersonal access Tokensも使用可能
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
-          # keep_filesをtrueにすると、git pushの度に一旦全てのファイルが削除される挙動を抑制できる
-          # keep_files: true
-          user_name: github-actions
-          user_email: github-actions@github.com
