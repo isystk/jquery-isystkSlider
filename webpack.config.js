@@ -1,6 +1,7 @@
 const path = require('path');
 const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 // 'production' か 'development' を指定
 const MODE = "development";
@@ -34,7 +35,12 @@ module.exports = () => ({
             // Sassファイルの読み込みとコンパイル
             {
                 test: /\.(css|scss)$/,
-                use: ["style-loader", "css-loader", "postcss-loader", "sass-loader"],
+                use: [
+                    MiniCssExtractPlugin.loader, 
+                    "css-loader", 
+                    "postcss-loader", 
+                    "sass-loader"
+                ],
             },
         ],
     },
@@ -47,6 +53,9 @@ module.exports = () => ({
             filename: 'index.html',
             template: './src/index.html',
             chunks: ['index'],
+        }),
+       new MiniCssExtractPlugin({
+          filename: 'index.css',
         }),
     ]
 });
