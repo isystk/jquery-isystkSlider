@@ -49,9 +49,9 @@
                     return;
                 }
 
-                const movieDir = imagePath.substring(0, imagePath.lastIndexOf('/') + 1).replace(/images/g, 'movies');
-                const movieFile = imagePath.substring(imagePath.lastIndexOf('/') + 1).replace(/([0-9]*)(.*).jpg(.*)/, '$1.mp4$3');
-                const moviePath = movieDir + movieFile;
+                const moviePath = imagePath
+                    .replace(/images/g, 'movies')
+                    .replace(/\.jpg/, '.mp4');
                 targetImg.data('moviepath', moviePath);
 
                 const copyImage = targetImg.clone(true);

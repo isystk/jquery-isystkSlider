@@ -37,7 +37,10 @@
             const targetItems = $.makeArray(targets
                 .map(function () {
                     let self = $(this);
-                    const imagePath = self.attr('src') || '';
+                    let imagePath = self.attr('src') || '';
+                    // オリジナルの画像パスに変更
+                    imagePath = imagePath
+                        .replace(/_sd/g, '');
                     const caption = self.attr('alt') || '';
                     const isMovie = self.hasClass('js-movie');
                     return {
@@ -163,9 +166,11 @@
                     , 'slideCallBack': function ({obj, pageNo}) {
                         // キャプションを変更する
                         changeCaption(pageNo);
+
+                        // 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
+                        revertImageFromVideo(mainFlame);
+                        
                         nowLoading = false;
-                    }, 'resizeCallBack': function (data) {
-                        mainFlame.css('width', $(window).width() + 'px');
                     }
                 });
 
@@ -206,7 +211,12 @@
                     // オーバーレイの設定
                     target
                         .attr('data-panel', '#' + mainFlame.attr('id'))
-                        .isystkOverlay();
+                        .isystkOverlay({
+                            closeCallback: () => {
+                                // 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
+                                revertImageFromVideo(mainFlame);
+                            }
+                        });
                 });
 
                 // 拡大写真パネルスライダー 前ページクリック時
@@ -279,6 +289,50 @@
                     }
                 });
             };
+            
+			// 再生済みのVideoを動画サムネイルに戻します。
+			const revertImageFromVideo = function (mainFlame) {
+				mainFlame.slider.find('.childKey video').each(function() {
+					var targetVideo = $(this),
+						target = targetVideo.closest('.childKey'),
+						photo = targetVideo.prev('img');
+					if (0 < targetVideo.length) {
+						// 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
+						targetVideo.remove();
+						photo.show();
+						photo.removeClass('movie-end');
+						photo.css('margin-top', '');
+                        // 画像を動画再生用サムネイルに変換
+                        changeMovieBox(photo);
+					}
+				});
+			};
+            
+            // 画像を動画再生用サムネイルに変換
+            const changeMovieBox = (target) => {
+                target.addClass('play');
+                target.isystkMovie({
+                    // 動画再生時
+                    clickCallback: function (obj) {
+                        // 余白の調整
+                        appendMargin(target);
+
+                        // 動画再生時にキャプションパネルを非表示にする。
+                        const partsArea = mainFlame.find('.photo_enlarge_partsArea');
+                        if (partsArea.is(':visible')) {
+                            partsArea.hide();
+                        }
+                    },
+                    // 動画停止時
+                    pauseCallback: function () {
+                        // 動画停止時にキャプションエリアを再表示する
+                        const partsArea = mainFlame.find('.photo_enlarge_partsArea');
+                        if (!partsArea.is(':visible')) {
+                            partsArea.show();
+                        }
+                    }
+                });
+            }
 
             const mainFlame = makeFlame();
             makeChild(function (childFlame) {
@@ -293,28 +347,7 @@
                     const target = $(this);
                     if (target.hasClass('js-movie')) {
                         // 画像を動画再生用サムネイルに変換
-                        target.addClass('play');
-                        target.isystkMovie({
-                            // 動画再生時
-                            clickCallback: function (obj) {
-                                // 余白の調整
-                                appendMargin(target);
-
-                                // 動画再生時にキャプションパネルを非表示にする。
-                                const partsArea = mainFlame.find('.photo_enlarge_partsArea');
-                                if (partsArea.is(':visible')) {
-                                    partsArea.hide();
-                                }
-                            },
-                            // 動画停止時
-                            pauseCallback: function () {
-                                // 動画停止時にキャプションエリアを再表示する
-                                const partsArea = mainFlame.find('.photo_enlarge_partsArea');
-                                if (!partsArea.is(':visible')) {
-                                    partsArea.show();
-                                }
-                            }
-                        });
+                        changeMovieBox(target);
                     }
                 })
                 nowLoading = false;
