@@ -428,6 +428,9 @@ video {
   --tw-backdrop-saturate:  ;
   --tw-backdrop-sepia:  ;
 }
+.visible{
+  visibility: visible;
+}
 .fixed{
   position: fixed;
 }
@@ -586,6 +589,33 @@ body {
 
 .isystk-slider .paging.dot li.active {
   background: #666;
+}
+
+/* 拡大パネル */
+.zoomPhotoPanel .prev a:before {
+  content: "";
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-image: url(7f8204edb8a74107da97.svg);
+  background-position: 17px 17px;
+  width: 50px;
+  height: 50px;
+  background-color: #fff;
+  opacity: 0.5;
+  border-radius: 50%;
+}
+
+.zoomPhotoPanel .next a:before {
+  content: "";
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-image: url(6a552c88e51dbad5749c.svg);
+  background-position: 17px 17px;
+  width: 50px;
+  height: 50px;
+  background-color: #fff;
+  opacity: 0.5;
+  border-radius: 50%;
 }
 
 /* オーバーレイ */
