@@ -596,7 +596,7 @@ body {
   content: "";
   display: inline-block;
   background-repeat: no-repeat;
-  background-image: url(7f8204edb8a74107da97.svg);
+  background-image: url(./images/btn-prev.svg);
   background-position: 17px 17px;
   width: 50px;
   height: 50px;
@@ -609,7 +609,7 @@ body {
   content: "";
   display: inline-block;
   background-repeat: no-repeat;
-  background-image: url(6a552c88e51dbad5749c.svg);
+  background-image: url(./images/btn-next.svg);
   background-position: 17px 17px;
   width: 50px;
   height: 50px;
@@ -670,21 +670,21 @@ body {
   zoom: 100%;
   color: #333;
   z-index: 1;
-  background: url(4bdc3d9801e3e6a24b60.png) 0 0 no-repeat;
+  background: url(./images/close-white.png) 0 0 no-repeat;
   background-size: 100% auto;
   width: 30px;
   height: 30px;
 }
 
 .isystk-overlay .next-btn {
-  background: url(6a552c88e51dbad5749c.svg) 0 0 no-repeat;
+  background: url(./images/btn-next.svg) 0 0 no-repeat;
   background-size: 100% auto;
   width: 30px;
   height: 30px;
 }
 
 .isystk-overlay .prev-btn {
-  background: url(7f8204edb8a74107da97.svg) 0 0 no-repeat;
+  background: url(./images/btn-prev.svg) 0 0 no-repeat;
   background-size: 100% auto;
   width: 30px;
   height: 30px;
@@ -698,7 +698,7 @@ body {
 
 .movieBox .playBtn {
   position: absolute;
-  background-image: url(10517428305efc409ee0.png);
+  background-image: url(./images/btn-movie.png);
   background-repeat: no-repeat;
   background-size: contain;
   width: 30%;
@@ -710,7 +710,7 @@ body {
 }
 
 .movieBox.play:hover .playBtn {
-  background-image: url(10517428305efc409ee0.png);
+  background-image: url(./images/btn-movie.png);
 }
 
 .movieBox .playTime {
