@@ -38,7 +38,7 @@
             let video = null;
             const movieBox = $(['<div class="movieBox" >',
                 '<div class="playBtn"></div>',
-                '<div class="playTime display-none"><span>' + playTime + '</span></div>',
+                '<div class="playTime" style="display: none"><span>' + playTime + '</span></div>',
                 '</div>'
             ].join(''));
 
@@ -63,7 +63,7 @@
                 movieBox.prepend(copyImage);
 
                 if (playTime !== '') {
-                    movieBox.find('.playTime').removeClass('display-none');
+                    movieBox.find('.playTime').show();
                 }
 
                 // 動画サムネイルをクリックした際に動画に差し替える。
@@ -92,8 +92,8 @@
                     // 表示サイズの調整
                     const img = $('<img>');
                     img.on('load', function () {
-                        var o_width = img[0].width;
-                        var o_height = img[0].height;
+                        const o_width = img[0].width;
+                        const o_height = img[0].height;
 
                         targetImg.attr('owidth', img[0].width);
                         targetImg.attr('oheight', img[0].height);
@@ -108,8 +108,8 @@
                     const img = $('<img>');
                     img.on('load', function () {
 
-                        var o_width = img[0].width;
-                        var o_height = img[0].height;
+                        const o_width = img[0].width;
+                        const o_height = img[0].height;
 
                         targetImg.attr('owidth', img[0].width);
                         targetImg.attr('oheight', img[0].height);
@@ -124,8 +124,8 @@
                     const img = $('<img>');
                     img.on('load', function () {
 
-                        var o_width = img[0].width;
-                        var o_height = img[0].height;
+                        const o_width = img[0].width;
+                        const o_height = img[0].height;
 
                         targetImg.attr('owidth', img[0].width);
                         targetImg.attr('oheight', img[0].height);
@@ -138,8 +138,8 @@
                     const img = $('<img>');
                     img.on('load', function () {
 
-                        var o_width = img[0].width;
-                        var o_height = img[0].height;
+                        const o_width = img[0].width;
+                        const o_height = img[0].height;
 
                         targetImg.attr('owidth', img[0].width);
                         targetImg.attr('oheight', img[0].height);

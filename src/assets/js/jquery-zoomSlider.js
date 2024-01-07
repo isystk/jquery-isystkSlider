@@ -125,19 +125,6 @@
 
                         photo.attr('owidth', img[0].width);
                         photo.attr('oheight', img[0].height);
-                        const x = Math.floor(photo.attr('oheight') * $(window).width() / photo.attr('owidth'));
-                        const margin = Math.floor(($(window).height() - x) / 2);
-                        if (0 <= margin) {
-                            photo
-                                .css('height', '')
-                                .css('width', '100%')
-                            ;
-                        } else {
-                            photo
-                                .css('height', '100%')
-                                .css('width', '')
-                                .css('margin', 'auto');
-                        }
                         if (photoLength !== 1) {
                             photoLength--;
                             return;
@@ -274,14 +261,32 @@
             const appendMargin = (childFlame) => {
                 // 画面上下にマージン設定（画像）
                 childFlame.each(function () {
-                    const photo = $(this).find('img'),
+                    let photo = $(this).find('img'),
                         oheight = photo.attr('oheight') || 0,
                         owidth = photo.attr('owidth') || 0;
-
-                    photo.closest('.childKey').css('padding-top', '');
+                    
+                    if (0 < photo.next('video').length) {
+                        // 動画が再生済みの場合
+                        photo = photo.next();
+                    }
 
                     const x = Math.floor(oheight * $(window).width() / owidth);
-                    const padding = Math.floor(($(window).height() - x) / 2) || 0;
+                    const margin = Math.floor(($(window).height() - x) / 2);
+                    if (0 <= margin) {
+                        photo
+                            .css('height', '')
+                            .css('width', '100%')
+                        ;
+                    } else {
+                        photo
+                            .css('height', '100%')
+                            .css('width', '')
+                            .css('margin', 'auto');
+                    }
+                    photo.closest('.childKey').css('padding-top', '');
+
+                    const y = Math.floor(oheight * $(window).width() / owidth);
+                    const padding = Math.floor(($(window).height() - y) / 2) || 0;
                     if (0 < padding) {
                         photo.closest('.childKey').css('padding-top', padding + 'px');
                     } else {
@@ -293,7 +298,7 @@
 			// 再生済みのVideoを動画サムネイルに戻します。
 			const revertImageFromVideo = function (mainFlame) {
 				mainFlame.slider.find('.childKey video').each(function() {
-					var targetVideo = $(this),
+					const targetVideo = $(this),
 						target = targetVideo.closest('.childKey'),
 						photo = targetVideo.prev('img');
 					if (0 < targetVideo.length) {
@@ -315,7 +320,7 @@
                     // 動画再生時
                     clickCallback: function (obj) {
                         // 余白の調整
-                        appendMargin(target);
+                        appendMargin(target.closest('.childKey'));
 
                         // 動画再生時にキャプションパネルを非表示にする。
                         const partsArea = mainFlame.find('.photo_enlarge_partsArea');
