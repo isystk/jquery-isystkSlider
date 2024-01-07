@@ -152,7 +152,7 @@
                     , 'carousel': true
                     , 'slideCallBack': function ({obj, pageNo}) {
                         // キャプションを変更する
-                        changeCaption(pageNo);
+                        changeInfo(pageNo);
 
                         // 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
                         revertImageFromVideo(mainFlame);
@@ -235,12 +235,11 @@
                 // スライダーを該当ページに切り替える
                 mainFlame.slider.changePage(pageNo);
                 // キャプションを変更する
-                changeCaption(pageNo);
-
+                changeInfo(pageNo);
             };
 
-            // キャプションを変更します
-            const changeCaption = (pageNo) => {
+            // 補足情報を変更します
+            const changeInfo = (pageNo) => {
                 const targetItem = targetItems[pageNo - 1];
                 const caption = targetItem.caption || '',
                     commentArea = mainFlame.find('.commentArea') || '',
@@ -251,48 +250,45 @@
                     .empty()
                     .text(caption);
 
+                // ページ番号
                 mainFlame.find('.commentArea .count').text(`${pageNo}/${targets.length}`);
 
-                // テキストを表示する
+                // 補足情報を表示する
                 mainFlame.find('.photo_enlarge_partsArea').show();
             };
 
             // 上下左右に余白を追加する。
-            const appendMargin = (childFlame) => {
-                // 画面上下にマージン設定（画像）
-                childFlame.each(function () {
-                    let photo = $(this).find('img'),
-                        oheight = photo.attr('oheight') || 0,
-                        owidth = photo.attr('owidth') || 0;
-                    
-                    if (0 < photo.next('video').length) {
-                        // 動画が再生済みの場合
-                        photo = photo.next();
-                    }
+            const appendMargin = (photo) => {
+                const oheight = photo.attr('oheight') || 0,
+                    owidth = photo.attr('owidth') || 0;
+                
+                if (0 < photo.next('video').length) {
+                    // 動画が再生済みの場合
+                    photo = photo.next();
+                }
 
-                    const x = Math.floor(oheight * $(window).width() / owidth);
-                    const margin = Math.floor(($(window).height() - x) / 2);
-                    if (0 <= margin) {
-                        photo
-                            .css('height', '')
-                            .css('width', '100%')
-                        ;
-                    } else {
-                        photo
-                            .css('height', '100%')
-                            .css('width', '')
-                            .css('margin', 'auto');
-                    }
-                    photo.closest('.childKey').css('padding-top', '');
+                const x = Math.floor(oheight * $(window).width() / owidth);
+                const margin = Math.floor(($(window).height() - x) / 2);
+                if (0 <= margin) {
+                    photo
+                        .css('height', '')
+                        .css('width', '100%')
+                    ;
+                } else {
+                    photo
+                        .css('height', '100%')
+                        .css('width', '')
+                        .css('margin', 'auto');
+                }
+                photo.closest('.childKey').css('padding-top', '');
 
-                    const y = Math.floor(oheight * $(window).width() / owidth);
-                    const padding = Math.floor(($(window).height() - y) / 2) || 0;
-                    if (0 < padding) {
-                        photo.closest('.childKey').css('padding-top', padding + 'px');
-                    } else {
-                        photo.closest('.childKey').css('padding-top', '0px');
-                    }
-                });
+                const y = Math.floor(oheight * $(window).width() / owidth);
+                const padding = Math.floor(($(window).height() - y) / 2) || 0;
+                if (0 < padding) {
+                    photo.closest('.childKey').css('padding-top', padding + 'px');
+                } else {
+                    photo.closest('.childKey').css('padding-top', '0px');
+                }
             };
             
 			// 再生済みのVideoを動画サムネイルに戻します。
@@ -320,21 +316,15 @@
                     // 動画再生時
                     clickCallback: function (obj) {
                         // 余白の調整
-                        appendMargin(target.closest('.childKey'));
+                        appendMargin(target);
 
                         // 動画再生時にキャプションパネルを非表示にする。
-                        const partsArea = mainFlame.find('.photo_enlarge_partsArea');
-                        if (partsArea.is(':visible')) {
-                            partsArea.hide();
-                        }
+                        mainFlame.find('.photo_enlarge_partsArea').hide();
                     },
                     // 動画停止時
                     pauseCallback: function () {
                         // 動画停止時にキャプションエリアを再表示する
-                        const partsArea = mainFlame.find('.photo_enlarge_partsArea');
-                        if (!partsArea.is(':visible')) {
-                            partsArea.show();
-                        }
+                        mainFlame.find('.photo_enlarge_partsArea').show();
                     }
                 });
             }
@@ -343,13 +333,15 @@
             makeChild(function (childFlame) {
                 mainFlame.find('.parentKey').append(childFlame);
 
-                // 余白の調整
-                appendMargin(childFlame);
-
+                // イベントの設定
                 bindEvents(mainFlame);
 
                 mainFlame.find('img').each(function () {
                     const target = $(this);
+
+                    // 余白の調整
+                    appendMargin(target);
+                    
                     if (target.hasClass('js-movie')) {
                         // 画像を動画再生用サムネイルに変換
                         changeMovieBox(target);
@@ -373,7 +365,6 @@
         'targetClass': 'img' // 拡大する画像要素
         , 'slideCallBack': null // スライド後に処理を行うコールバック(本プラグインで想定していない処理はここでカスタマイズする)
         , 'openCallBack': null // 拡大表示後のコールバック
-        , 'arrayCnt': 3 // 初期表示でロードする拡大画像内要素の数
     };
 
 })(jQuery);
