@@ -59,74 +59,69 @@
                 $(this).attr('page-no', (i + 1));
             });
 
-            exec();
+            if (screen.hasClass('slider-set-end')) {
+                // 既にスライダー設定済みの場合は何もしない
+                return;
+            }
 
-            function exec() {
+            // cssを調整する
+            ul.css('position', 'relative');
+            if (vertical) {
+                // 縦方向スライドの場合
+                ul.parent().css('overflow-y', 'hidden');
+            } else {
+                // 横方向スライドの場合
+                // li.css('float', 'left');
+                ul.css('display', 'flex');
+                ul.parent().css('overflow-x', 'hidden');
+            }
 
-                if (screen.hasClass('slider-set-end')) {
-                    // 既にスライダー設定済みの場合は何もしない
-                    return;
-                }
+            // レスポンシブ表示
+            responsiveEvent();
 
-                // cssを調整する
-                ul.css('position', 'relative');
-                if (vertical) {
-                    // 縦方向スライドの場合
-                    ul.parent().css('overflow-y', 'hidden');
-                } else {
-                    // 横方向スライドの場合
-                    // li.css('float', 'left');
-                    ul.css('display', 'flex');
-                    ul.parent().css('overflow-x', 'hidden');
-                }
+            if (vertical) {
+                const margin = Math.floor((li.outerHeight(true) - li.height()) / 2);
+                liwidth = li.height() + margin;
+            } else {
+                liwidth = li.outerWidth(true);
+            }
 
-                // レスポンシブ表示
-                responsiveEvent();
+            // スライド幅＝子要素横幅✕１ページに含まれる子要素の数
+            shiftw = liwidth * shift;
+            // 最大ページ数＝子要素の数÷１ページに含まれる子要素の数
+            maxPageNo = Math.ceil(li.length / shift);
 
-                if (vertical) {
-                    const margin = Math.floor((li.outerHeight(true) - li.height()) / 2);
-                    liwidth = li.height() + margin;
-                } else {
-                    liwidth = li.outerWidth(true);
-                }
+            // １ページの場合はスライド不要の為、カルーセルは強制OFFとする。
+            if (maxPageNo <= 1) {
+                carousel = false;
+                swipe = false;
+            }
 
-                // スライド幅＝子要素横幅✕１ページに含まれる子要素の数
-                shiftw = liwidth * shift;
-                // 最大ページ数＝子要素の数÷１ページに含まれる子要素の数
-                maxPageNo = Math.ceil(li.length / shift);
+            if (carousel) {
+                // カルーセルの初期設定を行う
+                initCarousel();
+                pos = shift * 2;
+            } else {
+                pos = shift;
+            }
 
-                // １ページの場合はスライド不要の為、カルーセルは強制OFFとする。
-                if (maxPageNo <= 1) {
-                    carousel = false;
-                    swipe = false;
-                }
+            if (vertical) {
+                // 縦方向スライドの場合
+                ul.css('height', shiftw * li.length / shift);
+                ul.parent().css('height', shiftw);
+            } else {
+                // 横方向スライドの場合
+                ul.css('width', shiftw * li.length / shift)
+            }
 
-                if (carousel) {
-                    // カルーセルの初期設定を行う
-                    initCarousel();
-                    pos = (li.length) / 3;
-                } else {
-                    pos = shift;
-                }
+            // ページングボタンの表示制御
+            showArrows();
 
-                if (vertical) {
-                    // 縦方向スライドの場合
-                    ul.css('height', shiftw * li.length / shift);
-                    ul.parent().css('height', shiftw);
-                } else {
-                    // 横方向スライドの場合
-                    ul.css('width', shiftw * li.length / shift)
-                }
+            // 各種イベントの設定
+            bindEvent();
 
-                // ページングボタンの表示制御
-                showArrows();
-
-                // 各種イベントの設定
-                bindEvent();
-
-                // スライダーを設定したよっていうマークを付ける。
-                screen.addClass('slider-set-end');
-            };
+            // スライダーを設定したよっていうマークを付ける。
+            screen.addClass('slider-set-end');
         };
 
         // 各種イベントの設定
@@ -313,9 +308,9 @@
 
             const direction = vertical ? 'top' : 'left';
             ul
-                .append(li.clone(true).addClass('cloned'))
-                .append(li.clone(true).addClass('cloned'))
-                .css(direction, '-' + (liwidth * (li.length)) + 'px');
+                .append(li.clone(true).slice(0, shift*2).addClass('cloned'))
+                .prepend(li.clone(true).slice(li.length-(shift*2), li.length).addClass('cloned'))
+                .css(direction, '-' + (liwidth * shift * 2) + 'px');
 
             // liを再キャッシュ
             li = ul.find(childKey);
@@ -324,13 +319,13 @@
         // カルーセル
         const doCarousel = () => {
             const direction = vertical ? 'top' : 'left';
-            // 左端
-            if (pos <= 0) {
-                pos = (li.length / 3);
+            if (pos <= shift) {
+                // 左端
+                pos = li.length - (shift * 3);
                 ul.css(direction, '-' + (liwidth * pos) + 'px');
+            } else if (li.length - (shift * 2) <= pos) {
                 // 右端
-            } else if (li.length / 3 * 2 <= pos) {
-                pos = (li.length / 3) + (pos - (li.length / 3) * 2);
+                pos = shift * 2;
                 ul.css(direction, '-' + (liwidth * pos) + 'px');
             }
         };
