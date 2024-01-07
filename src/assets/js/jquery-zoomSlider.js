@@ -1,14 +1,10 @@
-(function($){
+(function ($) {
     /*
-     * zoomSlider
-     *
-     * Copyright (c) 2024 iseyoshitaka 
-     *
-     * Sample:
-     * $('.js-zoomSlider').zoomSlider({}, function() {});
+     * 拡大スライダー
+     * 
+     * Copyright (c) 2024 iseyoshitaka
      */
-
-    $.fn.zoomSlider = function(options) {
+    $.fn.zoomSlider = function (options) {
 
         const params = $.extend({}, $.fn.zoomSlider.defaults, options);
 
@@ -19,12 +15,15 @@
 
             const screen = $(obj),
                 targetClass = params.targetClass;
-            
+
             const targets = screen
                 .find(targetClass)
                 .filter(function () {
-                    // 動画の場合は加工後のDomを除外する
-                    return !$(this).hasClass('js-movie')
+                    if($(this).closest('.child').hasClass('cloned')) {
+                        // カルーセルありの場合はクローンされたDOMを除外する
+                        return false
+                    }
+                    return true
                 });
 
             let nowLoading = true;
@@ -36,37 +35,37 @@
 
             /* ギャラリーに設定する画像データ配列を生成する */
             const targetItems = $.makeArray(targets
-                .map(function() {
+                .map(function () {
                     let self = $(this);
-                    if (self.hasClass('movieBox')) {
-                        self = self.find('img')
-                    }
                     const imagePath = self.attr('src') || '';
                     const caption = self.attr('alt') || '';
+                    const isMovie = self.hasClass('js-movie');
                     return {
                         imagePath,
-                        caption
+                        caption,
+                        isMovie
                     }
                 })
             );
 
             // メインフレームを生成します。
-            const makeFlame =  () => {
-                
+            const makeFlame = () => {
+
                 const mainFlame = $([
-                    '<div class="isystk-overlay">',
+                    '<div class="isystk-overlay zoomPhotoPanel">',
                         '<a href="#" class="js-close close"></a>',
                         '<div class="js-slider" style="overflow:hidden;margin 0 auto;background-color: #000;">',
-							'<ul class="parentKey photo_enlarge_imageArea">',
-							'</ul>',
-						'</div>',
+                            '<ul class="parentKey photo_enlarge_imageArea">',
+                            '</ul>',
+                        '</div>',
                         '<div class="photo_enlarge_partsArea">',
                             '<div class="transitionArea transitionList">',
-                                '<p class="item prev js-backBtn" style="position: absolute; top: 52%; left: 5px; margin-top: -20px;">' +
-                                    '<a href="#"><img src="./assets/images/btn-prev.svg" alt="前へ" /></a>' +
+                                '<p class="item prev js-prevBtn" style="position: absolute; top: 52%; left: 5px;' +
+                                ' margin-top: -20px;">' +
+                                    '<a href="#"></a>' +
                                 '</p>',
                                 '<p class="item next js-nextBtn" style="position: absolute; top: 52%; right: 5px; margin-top: -20px;">' +
-                                    '<a href="#"><img src="./assets/images/btn-next.svg" alt="次へ" /></a>' +
+                                    '<a href="#"></a>' +
                                 '</p>',
                             '</div>',
                             '<div class="commentArea" style="position: fixed;height: 29%;background: #000;opacity: 0.8;color:#fff;z-index: 10002;box-sizing: border-box;bottom: 0;width: 100%;padding: 10px;">',
@@ -87,7 +86,7 @@
                 if (gallery) {
                     index = gallery.length + 1;
                 }
-                mainFlame.attr('id', 'zoomSlider'+ index);
+                mainFlame.attr('id', 'zoomSlider' + index);
                 mainFlame.addClass(className);
                 mainFlame.width($(window).width());
 
@@ -97,13 +96,13 @@
             }
 
             // 子要素を生成します。
-            const makeChild =  (callback) => {
+            const makeChild = (callback) => {
 
                 // 拡大写真パネルを生成する
                 const li = $(targetItems.map((data) => {
                     return [
                         '<li class="childKey">',
-                            '<img src="'+data.imagePath+'" alt="'+data.caption+'" />',
+                        '<img src="' + data.imagePath + '" alt="' + data.caption + '" class="' + (data.isMovie ? 'js-movie' : '') + '"/>',
                         '</li>'].join('');
                 }).join(''));
                 li.css('text-align', 'center')
@@ -115,16 +114,16 @@
 
                 const images = li.find('img');
                 let photoLength = images.length;
-                images.each(function() {
+                images.each(function () {
                     const photo = $(this),
                         imagePath = photo.attr('src') || '';
                     const img = $('<img>');
-                    img.on('load',function(){
+                    img.on('load', function () {
 
                         photo.attr('owidth', img[0].width);
                         photo.attr('oheight', img[0].height);
-                        var x = Math.floor(photo.attr('oheight') * $(window).width() / photo.attr('owidth'));
-                        var margin = Math.floor(($(window).height() - x) / 2);
+                        const x = Math.floor(photo.attr('oheight') * $(window).width() / photo.attr('owidth'));
+                        const margin = Math.floor(($(window).height() - x) / 2);
                         if (0 <= margin) {
                             photo
                                 .css('height', '')
@@ -161,7 +160,7 @@
                     , 'responsive': true
                     , 'animateType': $.fn.isystkSlider.ANIMATE_TYPE.SLIDE
                     , 'carousel': true
-                    , 'slideCallBack': function({obj, pageNo}) {
+                    , 'slideCallBack': function ({obj, pageNo}) {
                         // キャプションを変更する
                         changeCaption(pageNo);
                         nowLoading = false;
@@ -172,9 +171,9 @@
 
                 // 子要素をタップ時にキャプションの表示/非表示を切り替える。
                 let showPartsArea = true;
-                slider.click(function(e) {
+                slider.click(function (e) {
                     const partsArea = mainFlame.find('.photo_enlarge_partsArea');
-                    const timer = setTimeout(function() {
+                    const timer = setTimeout(function () {
                         clearInterval(timer);
                         if (showPartsArea) {
                             partsArea.hide();
@@ -183,26 +182,35 @@
                             partsArea.show();
                             showPartsArea = true;
                         }
-                    } , 200);
+                    }, 200);
                 });
-                
-                // 対象画像クリック時に拡大写真パネルを表示する
-                targets.css('cursor', 'pointer');
-                targets.each(function(i) {
-                    const target = $(this),
-                        pageNo = i+1;
 
-                    target.bind('click', function(e) {
+                // 対象画像クリック時に拡大写真パネルを表示する
+                screen.find(targetClass).each(function () {
+                    let target = $(this);
+
+                    if (target.hasClass('js-movie')) {
+                        target = target.next();
+                    }
+
+                    target.css('cursor', 'pointer');
+                    target.bind('click', function (e) {
                         e.preventDefault();
                         if (nowLoading) {
                             return;
                         }
+                        const pageNo = $(this).closest('.child').attr('page-no');
                         showPage(pageNo);
                     });
+
+                    // オーバーレイの設定
+                    target
+                        .attr('data-panel', '#' + mainFlame.attr('id'))
+                        .isystkOverlay();
                 });
 
                 // 拡大写真パネルスライダー 前ページクリック時
-                mainFlame.find('.js-prevBtn').click(function(e) {
+                mainFlame.find('.js-prevBtn').click(function (e) {
                     e.preventDefault();
                     if (nowLoading) {
                         return;
@@ -212,7 +220,7 @@
                 });
 
                 // 拡大写真パネルスライダー 次ページクリック時
-                mainFlame.find('.js-nextBtn').click(function(e) {
+                mainFlame.find('.js-nextBtn').click(function (e) {
                     e.preventDefault();
                     if (nowLoading) {
                         return;
@@ -227,14 +235,16 @@
                 if (nowLoading) {
                     return;
                 }
+                // スライダーを該当ページに切り替える
                 mainFlame.slider.changePage(pageNo);
                 // キャプションを変更する
-                changeCaption(pageNo);  
+                changeCaption(pageNo);
+
             };
-            
+
             // キャプションを変更します
             const changeCaption = (pageNo) => {
-                const targetItem = targetItems[pageNo-1];
+                const targetItem = targetItems[pageNo - 1];
                 const caption = targetItem.caption || '',
                     commentArea = mainFlame.find('.commentArea') || '',
                     captionArea = commentArea.find('.comment .captionArea') || '';
@@ -253,7 +263,7 @@
             // 上下左右に余白を追加する。
             const appendMargin = (childFlame) => {
                 // 画面上下にマージン設定（画像）
-                childFlame.each(function() {
+                childFlame.each(function () {
                     const photo = $(this).find('img'),
                         oheight = photo.attr('oheight') || 0,
                         owidth = photo.attr('owidth') || 0;
@@ -271,28 +281,49 @@
             };
 
             const mainFlame = makeFlame();
-            makeChild(function(childFlame) {
+            makeChild(function (childFlame) {
                 mainFlame.find('.parentKey').append(childFlame);
 
                 // 余白の調整
                 appendMargin(childFlame);
-                
+
                 bindEvents(mainFlame);
+
+                mainFlame.find('img').each(function () {
+                    const target = $(this);
+                    if (target.hasClass('js-movie')) {
+                        // 画像を動画再生用サムネイルに変換
+                        target.addClass('play');
+                        target.isystkMovie({
+                            // 動画再生時
+                            clickCallback: function (obj) {
+                                // 余白の調整
+                                appendMargin(target);
+
+                                // 動画再生時にキャプションパネルを非表示にする。
+                                const partsArea = mainFlame.find('.photo_enlarge_partsArea');
+                                if (partsArea.is(':visible')) {
+                                    partsArea.hide();
+                                }
+                            },
+                            // 動画停止時
+                            pauseCallback: function () {
+                                // 動画停止時にキャプションエリアを再表示する
+                                const partsArea = mainFlame.find('.photo_enlarge_partsArea');
+                                if (!partsArea.is(':visible')) {
+                                    partsArea.show();
+                                }
+                            }
+                        });
+                    }
+                })
                 nowLoading = false;
             });
-
-            // オーバーレイの設定
-            targets
-                .each(function() {
-                    // 対象をクリックした際に表示する拡大パネルを指定する
-                    $(this).attr('data-panel', '#' + mainFlame.attr('id'));
-                })
-                .isystkOverlay();
 
         };
 
         // 処理開始
-        $(this).each(function() {
+        $(this).each(function () {
             init(this);
         });
 

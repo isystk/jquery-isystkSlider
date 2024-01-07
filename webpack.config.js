@@ -30,7 +30,6 @@ module.exports = () => ({
                 test: /\.html$/,
                 loader: 'html-loader'
             },
-            // Sassファイルの読み込みとコンパイル
             {
                 test: /\.(css|scss)$/,
                 use: [
@@ -41,14 +40,18 @@ module.exports = () => ({
                 ],
             },
             // {
-            //     //拡張子がpng,jpg,gif,svgを検知したら
-            //     test: /\.(png|jpg|gif|svg)/,
+            //     test: /\.(png|jpe?g|gif|svg)/,
             //     use: [
             //         {
             //             loader: 'file-loader',
             //             options: {
             //                 //[name]は画像名、[ext]は拡張子
-            //                 name: 'images/[name].[ext]'
+            //                 name: '[name].[ext]',
+            //                 outputPath : 'images/',
+            //                 publicPath : function(path){
+            //                   return './images/' + path;
+            //                 },
+            //                 esModule: false
             //             }
             //         }
             //     ]
@@ -60,9 +63,9 @@ module.exports = () => ({
     plugins: [
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
-            inject: 'body',
             filename: 'index.html',
             template: './src/index.html',
+            inject: true,
             chunks: ['index'],
         }),
        new MiniCssExtractPlugin({
