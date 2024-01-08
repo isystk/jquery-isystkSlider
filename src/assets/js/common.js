@@ -47,6 +47,12 @@ $(function () {
             e.preventDefault();
             slider.changePage($(this).data('page-no'), $.fn.isystkSlider.ANIMATE_TYPE.SLIDE);
         });
+        // 動的なページの追加
+        slider.find('.addDataBtn').click(function () {
+            const ul = slider.find('.addData'),
+                li = ul.find('li').slice(0, 3);
+            slider.appendChild(li)
+        });
     });
 
     // 拡大画像スライダー

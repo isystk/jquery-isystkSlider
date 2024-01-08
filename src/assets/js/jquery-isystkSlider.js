@@ -38,7 +38,6 @@
         const init = function (obj) {
             screen = $(obj);
             ul = screen.find(params.parentKey);
-            li = ul.find(params.childKey);
             back = screen.find(params.prevBtnKey);
             next = screen.find(params.nextBtnKey);
             childKey = params.childKey;
@@ -55,65 +54,19 @@
             carousel = params.carousel;
             slideCallBackFunc = params.slideCallBack;
 
-            ul.find(childKey).each(function (i) {
-                $(this).attr('page-no', (i + 1));
-            });
-
             if (screen.hasClass('slider-set-end')) {
                 // 既にスライダー設定済みの場合は何もしない
                 return;
             }
 
-            // cssを調整する
-            ul.css('position', 'relative');
-            if (vertical) {
-                // 縦方向スライドの場合
-                ul.parent().css('overflow-y', 'hidden');
-            } else {
-                // 横方向スライドの場合
-                // li.css('float', 'left');
-                ul.css('display', 'flex');
-                ul.parent().css('overflow-x', 'hidden');
-            }
-
-            // レスポンシブ表示
-            responsiveEvent();
-
-            if (vertical) {
-                const margin = Math.floor((li.outerHeight(true) - li.height()) / 2);
-                liwidth = li.height() + margin;
-            } else {
-                liwidth = li.outerWidth(true);
-            }
-
-            // スライド幅＝子要素横幅✕１ページに含まれる子要素の数
-            shiftw = liwidth * shift;
-            // 最大ページ数＝子要素の数÷１ページに含まれる子要素の数
-            maxPageNo = Math.ceil(li.length / shift);
-
-            // １ページの場合はスライド不要の為、カルーセルは強制OFFとする。
-            if (maxPageNo <= 1) {
-                carousel = false;
-                swipe = false;
-            }
+            // 表示要素のサイズ調整
+            changeSize();
 
             if (carousel) {
                 // カルーセルの初期設定を行う
                 initCarousel();
             }
             pos = shift;
-
-            if (vertical) {
-                // 縦方向スライドの場合
-                ul.css('height', shiftw * li.length / shift);
-                ul.parent().css('height', shiftw);
-            } else {
-                // 横方向スライドの場合
-                ul.css('width', shiftw * li.length / shift)
-            }
-
-            // ページングボタンの表示制御
-            showArrows();
 
             // 各種イベントの設定
             bindEvent();
@@ -343,40 +296,77 @@
             });
         };
 
-        // レスポンシブで表示する
-        const responsiveEvent = () => {
-            if (!responsive) {
-                // レスポンシブが有効になっていない場合は何もしない。
-                return;
-            }
+        // 要素のサイズ調整
+        const changeSize = () => {
             const exec = function () {
 
-                // ピンチアウト中の場合はリセットする。
-                if (zoom) {
-                    zoomImage.resetImage();
+                li = ul.find(params.childKey);
+
+                li.each(function (i) {
+                    $(this).attr('page-no', (i + 1));
+                });
+
+                // cssを調整する
+                ul.css('position', 'relative');
+                if (vertical) {
+                    // 縦方向スライドの場合
+                    ul.parent().css('overflow-y', 'hidden');
+                } else {
+                    // 横方向スライドの場合
+                    // li.css('float', 'left');
+                    ul.css('display', 'flex');
+                    ul.parent().css('overflow-x', 'hidden');
+                }
+
+                if (vertical) {
+                    const margin = Math.floor((li.outerHeight(true) - li.height()) / 2);
+                    liwidth = li.height() + margin;
+                } else {
+                    if (responsive) {
+                        // 子要素の横幅を端末のwidthに設定
+                        const margin = ul.find(childKey).outerWidth(true) - ul.find(childKey).width();
+                        ul.find(childKey).css('min-width', $(window).width() - margin);
+                    }
+                    liwidth = li.outerWidth(true);
+                }
+
+                // スライド幅＝子要素横幅✕１ページに含まれる子要素の数
+                shiftw = liwidth * shift;
+                // 最大ページ数＝子要素の数÷１ページに含まれる子要素の数
+                maxPageNo = Math.ceil(li.filter(function () {
+                    return !$(this).hasClass('cloned')
+                }).length / shift);
+
+                // １ページの場合はスライド不要の為、カルーセルは強制OFFとする。
+                if (maxPageNo <= 1) {
+                    carousel = false;
+                    swipe = false;
                 }
 
                 if (vertical) {
                     // 縦方向スライドの場合
-                    
-                    const margin = Math.floor((li.outerHeight(true) - li.height()) / 2);
-                    liwidth = li.height() + margin;
                     ul.css('height', shiftw * li.length / shift);
                     ul.parent().css('height', shiftw);
                 } else {
                     // 横方向スライドの場合
-                    
-                    // 子要素の横幅を端末のwidthに設定
-                    const margin = ul.find(childKey).outerWidth(true) - ul.find(childKey).width();
-                    ul.find(childKey).css('min-width', $(window).width() - margin);
-
-                    liwidth = li.outerWidth(true);
-                    ul.css('width', shiftw * li.length / shift);
+                    ul.css('width', shiftw * li.length / shift)
                 }
-                shiftw = liwidth * shift;
 
-                const direction = vertical ? 'top' : 'left';
-                ul.css(direction, '-' + (liwidth * shift * pos) + 'px');
+                // ページングボタンの表示制御
+                showArrows();
+                
+                if (responsive) {
+                    // レスポンシブが有効になっている場合
+
+                    // ピンチアウト中の場合はリセットする。
+                    if (zoom) {
+                        zoomImage.resetImage();
+                    }
+
+                    const direction = vertical ? 'top' : 'left';
+                    ul.css(direction, '-' + (liwidth * shift * pos) + 'px');
+                }
+
             };
 
             // 画面が回転された場合
@@ -1258,6 +1248,25 @@
             slide(move, animateType);
         }
 
+        // 動的に子要素を追加します。
+        const appendChild = this.appendChild = (_childs, _pos) => {
+            const li = ul.find(childKey);
+            if (!_pos) {
+                // 追加位置が未指定の場合は最後に追加する
+                _pos = li.length -1;
+            }
+            // 追加する位置の直前の子要素
+            const prevLi = li.get(_pos)
+            
+            _childs.each(function(index) {
+                const reverseIndex = _childs.length - 1 - index;
+                prevLi.after(_childs[reverseIndex]);
+            });
+
+            // 表示要素のサイズ調整
+            changeSize();
+        }
+        
         // 処理開始
         $(this).each(function () {
             init(this);
