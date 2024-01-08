@@ -20,6 +20,7 @@ $(function () {
             maxPageNo
         })
 
+        let nowPage = 1;
         const slider = self.isystkSlider({
             'parentKey': '.parent',
             'childKey': '.child',
@@ -32,6 +33,7 @@ $(function () {
             vertical,
             autoSlide,
             'slideCallBack': function ({pageNo, maxPageNo}) {
+                nowPage = pageNo;
                 // ページ番号を設定する
                 setPageNo({pageNo, maxPageNo})
                 // ページ番号（ドット）を選択する
@@ -48,12 +50,20 @@ $(function () {
             slider.changePage($(this).data('page-no'), $.fn.isystkSlider.ANIMATE_TYPE.SLIDE);
         });
         // 動的なページの追加
-        slider.find('.addDataBtn').click(function () {
+        slider.find('.addPrevBtn').click(function () {
             const ul = slider.find('.addData'),
                 li = ul.find('li').slice(0, 3);
-            slider.appendChild(li)
+            slider.appendChild(li, ((nowPage-1)*shift))
+        });
+        slider.find('.addAfterBtn').click(function () {
+            const ul = slider.find('.addData'),
+                li = ul.find('li').slice(0, 3);
+            slider.appendChild(li, (nowPage*shift))
         });
     });
+
+    // 動画
+    $('img.js-movie').isystkMovie();
 
     // 拡大画像スライダー
     $('.zoom-slider').each(function () {
@@ -61,10 +71,6 @@ $(function () {
             'targetClass': 'img.zoom',
         });
     });
-
-    // 動画
-    $('img.js-movie').isystkMovie();
-
 });
 
 

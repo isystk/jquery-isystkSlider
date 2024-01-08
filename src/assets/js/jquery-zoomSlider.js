@@ -26,14 +26,12 @@
                     return true
                 });
 
-            let nowLoading = true;
-
             if (targets.length === 0) {
                 // 拡大対象が１つもない場合は何もしない。
                 return;
             }
 
-            /* ギャラリーに設定する画像データ配列を生成する */
+            /* 対象の画像データを配列に保持する */
             const targetItems = $.makeArray(targets
                 .map(function () {
                     let self = $(this);
@@ -92,49 +90,111 @@
                 mainFlame.attr('id', 'zoomSlider' + index);
                 mainFlame.addClass(className);
                 mainFlame.width($(window).width());
-
+                mainFlame.height($(window).height());
+                
                 $('body').append(mainFlame);
 
                 return mainFlame;
             }
 
             // 子要素を生成します。
-            const makeChild = (callback) => {
+            const makeChild = (_pageNo ,callBackFunc) => {
+                _pageNo = parseInt(_pageNo);
 
-                // 拡大写真パネルを生成する
-                const li = $(targetItems.map((data) => {
-                    return [
-                        '<li class="childKey">',
-                        '<img src="' + data.imagePath + '" alt="' + data.caption + '" class="' + (data.isMovie ? 'js-movie' : '') + '"/>',
-                        '</li>'].join('');
-                }).join(''));
-                li.css('text-align', 'center')
-                    .css('margin-top', '0px');
+                let index = 0;
+                const callback = () => {
+                    index++
+                    if (index < 3) {
+                        return
+                    }
+                    if (callBackFunc) {
+                        callBackFunc()
+                    }
+                }
+                
+                // 表示するページと前後の３ページ分を生成する
+                [
+                    _pageNo-1,
+                    _pageNo,
+                    _pageNo+1
+                ].forEach((pageNo) => {
+                    if (pageNo <= 0) {
+                        pageNo = targetItems.length;
+                    }
+                    if (targetItems.length < pageNo) {
+                        pageNo = 1;
+                    }
+                    const page = mainFlame.find('.childKey[zoom-page-no="'+pageNo+'"]');
+                    if (0 < page.length) {
+                        // ページが存在する場合は追加しない
+                        callback();
+                        return
+                    }
+                    const data = targetItems[pageNo-1]
+                    const li = $([
+                        '<li class="childKey" zoom-page-no="'+pageNo+'" style="text-align: center; margin-top: 0">',
+                            '<img src="' + data.imagePath + '" alt="' + data.caption + '" class="' + (data.isMovie ? 'js-movie' : '') + '"/>',
+                        '</li>'
+                    ].join(''));
 
-                // 子要素の横幅を端末のwidthに設定
-                li.width($(window).width());
-                li.height($(window).height());
+                    // 子要素の横幅を端末のwidthに設定
+                    li.width($(window).width());
+                    li.height($(window).height());
 
-                const images = li.find('img');
-                let photoLength = images.length;
-                images.each(function () {
-                    const photo = $(this),
-                        imagePath = photo.attr('src') || '';
-                    const img = $('<img>');
-                    img.on('load', function () {
+                    const images = li.find('img');
+                    let photoLength = images.length;
+                    images.each(function () {
+                        const photo = $(this),
+                            imagePath = photo.attr('src') || '';
+                        const img = $('<img>');
+                        img.on('load', function () {
 
-                        photo.attr('owidth', img[0].width);
-                        photo.attr('oheight', img[0].height);
-                        if (photoLength !== 1) {
-                            photoLength--;
-                            return;
-                        }
-                        images.unbind('load');
+                            photo.attr('owidth', img[0].width);
+                            photo.attr('oheight', img[0].height);
+                            if (photoLength !== 1) {
+                                photoLength--;
+                                callback();
+                                return;
+                            }
+                            images.unbind('load');
 
-                        callback(li);
+                            const index = findAppendPos(pageNo)
+                            // スライダーを該当ページを追加
+                            mainFlame.slider.appendChild(li, index);
+
+                            // 余白の調整
+                            appendMargin(photo);
+
+                            if (photo.hasClass('js-movie')) {
+                                // 画像を動画再生用サムネイルに変換
+                                changeMovieBox(photo);
+                            }
+
+                            callback();
+                        });
+                        img.attr('src', imagePath);
                     });
-                    img.attr('src', imagePath);
                 });
+                
+                // 次のDOMを追加する位置を算出します。
+                const findAppendPos = function (pageNo) {
+                    pageNo = parseInt(pageNo)
+                    const li = mainFlame.slider.find('.childKey');
+                    if (li.length === 0) {
+                        return 0;
+                    }
+                    const index = mainFlame.slider.find('.childKey[zoom-page-no="'+pageNo+'"]').filter(function () {
+                        return !$(this).hasClass('cloned')
+                    }).index();
+                    if(index < 0) {
+                        pageNo = pageNo - 1;
+                        if (pageNo === 0) {
+                            return 0;
+                        }
+                        return findAppendPos(pageNo)
+                    }
+                    return index;
+                };
             }
 
             // イベントバンドル
@@ -151,13 +211,12 @@
                     , 'animateType': $.fn.isystkSlider.ANIMATE_TYPE.SLIDE
                     , 'carousel': true
                     , 'slideCallBack': function ({obj, pageNo}) {
+
                         // キャプションを変更する
                         changeInfo(pageNo);
 
                         // 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
                         revertImageFromVideo(mainFlame);
-                        
-                        nowLoading = false;
                     }
                 });
 
@@ -188,11 +247,18 @@
                     target.css('cursor', 'pointer');
                     target.bind('click', function (e) {
                         e.preventDefault();
-                        if (nowLoading) {
-                            return;
-                        }
                         const pageNo = $(this).closest('.child').attr('page-no');
-                        showPage(pageNo);
+
+                        // ページが存在しない場合は追加
+                        makeChild(pageNo, function () {
+                            const page = mainFlame.find('.childKey[zoom-page-no="'+pageNo+'"]');
+                            if (0 < page.length) {
+                                mainFlame.slider.changePage(page.attr('page-no'));
+
+                                // キャプションを変更する
+                                changeInfo(pageNo);
+                            }
+                        });
                     });
 
                     // オーバーレイの設定
@@ -209,33 +275,14 @@
                 // 拡大写真パネルスライダー 前ページクリック時
                 mainFlame.find('.js-prevBtn').click(function (e) {
                     e.preventDefault();
-                    if (nowLoading) {
-                        return;
-                    }
-                    nowLoading = true;
                     mainFlame.slider.prevPage();
                 });
 
                 // 拡大写真パネルスライダー 次ページクリック時
                 mainFlame.find('.js-nextBtn').click(function (e) {
                     e.preventDefault();
-                    if (nowLoading) {
-                        return;
-                    }
-                    nowLoading = true;
                     mainFlame.slider.nextPage();
                 });
-            };
-
-            // 指定したページを表示します。
-            const showPage = (pageNo = 1) => {
-                if (nowLoading) {
-                    return;
-                }
-                // スライダーを該当ページに切り替える
-                mainFlame.slider.changePage(pageNo);
-                // キャプションを変更する
-                changeInfo(pageNo);
             };
 
             // 補足情報を変更します
@@ -330,26 +377,12 @@
             }
 
             const mainFlame = makeFlame();
-            makeChild(function (childFlame) {
-                mainFlame.find('.parentKey').append(childFlame);
 
-                // イベントの設定
-                bindEvents(mainFlame);
-
-                mainFlame.find('img').each(function () {
-                    const target = $(this);
-
-                    // 余白の調整
-                    appendMargin(target);
-                    
-                    if (target.hasClass('js-movie')) {
-                        // 画像を動画再生用サムネイルに変換
-                        changeMovieBox(target);
-                    }
-                })
-                nowLoading = false;
-            });
-
+            // 1ページ目だけを追加
+            makeChild(1);
+            
+            // イベントの設定
+            bindEvents(mainFlame);
         };
 
         // 処理開始

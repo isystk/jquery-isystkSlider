@@ -62,10 +62,6 @@
             // 表示要素のサイズ調整
             changeSize();
 
-            if (carousel) {
-                // カルーセルの初期設定を行う
-                initCarousel();
-            }
             pos = shift;
 
             // 各種イベントの設定
@@ -240,12 +236,16 @@
 
         // カルーセル用に両端に番兵を作成する
         const initCarousel = () => {
+            
+            // 既に番兵がある場合はリセット
+            ul.find('.cloned').remove()
+            li = ul.find(childKey);
 
             // 最終ページに空きが出来る場合は空のLIダグを追加する。例）｜○○○｜○○○｜○○○｜○  ｜
             const addSize = li.length % shift;
             if (addSize !== 0) {
                 for (let i = 0, len = shift - addSize; i < len; i++) {
-                    const clone = ul.find(childKey).filter(':first').clone(true).empty();
+                    const clone = ul.find(childKey).filter(':first').clone(true).addClass('cloned').empty();
                     if (vertical) {
                         clone.css('height', li.height()).css('width', '1px')
                     } else {
@@ -338,10 +338,10 @@
                 }).length / shift);
 
                 // １ページの場合はスライド不要の為、カルーセルは強制OFFとする。
-                if (maxPageNo <= 1) {
-                    carousel = false;
-                    swipe = false;
-                }
+                // if (maxPageNo <= 1) {
+                //     carousel = false;
+                //     swipe = false;
+                // }
 
                 if (vertical) {
                     // 縦方向スライドの場合
@@ -367,6 +367,9 @@
                     ul.css(direction, '-' + (liwidth * shift * pos) + 'px');
                 }
 
+                if (carousel) {
+                    initCarousel();
+                }
             };
 
             // 画面が回転された場合
@@ -1250,21 +1253,36 @@
 
         // 動的に子要素を追加します。
         const appendChild = this.appendChild = (_childs, _pos) => {
+            
+            // 既に番兵がある場合はリセット
+            ul.find('.cloned').remove()
+            
             const li = ul.find(childKey);
-            if (!_pos) {
+            if (_pos === undefined) {
                 // 追加位置が未指定の場合は最後に追加する
                 _pos = li.length -1;
             }
             // 追加する位置の直前の子要素
             const prevLi = li.get(_pos)
             
-            _childs.each(function(index) {
-                const reverseIndex = _childs.length - 1 - index;
-                prevLi.after(_childs[reverseIndex]);
-            });
+            if (prevLi) {
+                _childs.each(function(index) {
+                    const reverseIndex = _childs.length - 1 - index;
+                    prevLi.before(_childs[reverseIndex]);
+                });
+            } else {
+                // 子要素が１つもない場合
+                ul.append(_childs)
+            }
 
             // 表示要素のサイズ調整
             changeSize();
+
+            if (_pos < pos) {
+                // 手前に追加した場合は１ページズレるので補正する
+                changePage(pageNo+1)
+            }
+            
         }
         
         // 処理開始
