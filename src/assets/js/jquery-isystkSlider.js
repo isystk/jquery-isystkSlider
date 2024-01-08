@@ -100,10 +100,8 @@
             if (carousel) {
                 // カルーセルの初期設定を行う
                 initCarousel();
-                pos = shift * 2;
-            } else {
-                pos = shift;
             }
+            pos = shift;
 
             if (vertical) {
                 // 縦方向スライドの場合
@@ -308,9 +306,9 @@
 
             const direction = vertical ? 'top' : 'left';
             ul
-                .append(li.clone(true).slice(0, shift*2).addClass('cloned'))
-                .prepend(li.clone(true).slice(li.length-(shift*2), li.length).addClass('cloned'))
-                .css(direction, '-' + (liwidth * shift * 2) + 'px');
+                .append(li.clone(true).slice(0, shift).addClass('cloned'))
+                .prepend(li.clone(true).slice(li.length-(shift), li.length).addClass('cloned'))
+                .css(direction, '-' + (liwidth * shift) + 'px');
 
             // liを再キャッシュ
             li = ul.find(childKey);
@@ -319,13 +317,13 @@
         // カルーセル
         const doCarousel = () => {
             const direction = vertical ? 'top' : 'left';
-            if (pos <= shift) {
+            if (pos <= 0) {
                 // 左端
-                pos = li.length - (shift * 3);
+                pos = li.length - (shift * 2);
                 ul.css(direction, '-' + (liwidth * pos) + 'px');
-            } else if (li.length - (shift * 2) <= pos) {
+            } else if (li.length - shift <= pos) {
                 // 右端
-                pos = shift * 2;
+                pos = shift;
                 ul.css(direction, '-' + (liwidth * pos) + 'px');
             }
         };
@@ -351,38 +349,41 @@
                 // レスポンシブが有効になっていない場合は何もしない。
                 return;
             }
-            // スライダーの表示幅を調整します。
-            const changeDisplay = function () {
+            const exec = function () {
 
                 // ピンチアウト中の場合はリセットする。
                 if (zoom) {
                     zoomImage.resetImage();
                 }
 
-                // 子要素の横幅を端末のwidthに設定
-                const margin = ul.find(childKey).outerWidth(true) - ul.find(childKey).width();
-                ul.find(childKey).css('min-width', $(window).width() - margin);
+                if (vertical) {
+                    // 縦方向スライドの場合
+                    
+                    const margin = Math.floor((li.outerHeight(true) - li.height()) / 2);
+                    liwidth = li.height() + margin;
+                    ul.css('height', shiftw * li.length / shift);
+                    ul.parent().css('height', shiftw);
+                } else {
+                    // 横方向スライドの場合
+                    
+                    // 子要素の横幅を端末のwidthに設定
+                    const margin = ul.find(childKey).outerWidth(true) - ul.find(childKey).width();
+                    ul.find(childKey).css('min-width', $(window).width() - margin);
 
-                if (carousel && 1 < maxPageNo) {
-                    const direction = vertical ? 'top' : 'left';
-                    pos = li.length / 3;
-                    ul.css(direction, '-' + (liwidth * (li.length / 3 * 2)) + 'px');
-
-                    const workPageNo = pageNo;
-                    pageNo = 1;
-                    changePage(workPageNo);
+                    liwidth = li.outerWidth(true);
+                    ul.css('width', shiftw * li.length / shift);
                 }
+                shiftw = liwidth * shift;
+
+                const direction = vertical ? 'top' : 'left';
+                ul.css(direction, '-' + (liwidth * shift * pos) + 'px');
             };
 
             // 画面が回転された場合
-            $(this).on('orientationchange', function () {
-                changeDisplay();
-            });
+            $(window).on('orientationchange', exec);
             // 画面がリサイズされた場合
-            $(this).resize(function () {
-                changeDisplay();
-            });
-            changeDisplay();
+            $(window).resize(exec);
+            exec();
         }
 
         // スワイプでのページングを可能にする
