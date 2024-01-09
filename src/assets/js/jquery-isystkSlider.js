@@ -63,8 +63,8 @@
                 pos = shift;
             }
 
-            // 表示要素のサイズ調整
-            changeSize();
+            // 表示要素をリセットする
+            reset();
 
             // 各種イベントの設定
             bindEvent();
@@ -101,12 +101,12 @@
                 zoomImage.init();
             }
 
-            if (maxPageNo <= 1) {
-                // 子要素が１つの場合は何もしない
-                nowLoading = false;
-                dragw = 0;
-                return;
-            }
+            // if (maxPageNo <= 1) {
+            //     // 子要素が１つの場合は何もしない
+            //     nowLoading = false;
+            //     dragw = 0;
+            //     return;
+            // }
 
             if (!carousel) {
                 // カルーセルでない場合
@@ -122,12 +122,12 @@
             let from = -1 * (pos / shift) * shiftw - dragw;
             const to = from - (shiftw * move) + dragw;
 
-            if (from === to) {
-                // 移動が先が同じ位置の場合は何もしない
-                nowLoading = false;
-                dragw = 0;
-                return;
-            }
+            // if (from === to) {
+            //     // 移動が先が同じ位置の場合は何もしない
+            //     nowLoading = false;
+            //     dragw = 0;
+            //     return;
+            // }
 
             nowLoading = true;
 
@@ -290,7 +290,7 @@
         };
 
         // 要素のサイズ調整
-        const changeSize = () => {
+        const reset = () => {
             const exec = function () {
 
                 // 既に番兵がある場合はリセット
@@ -1246,9 +1246,14 @@
             slide(move, animateType);
         }
 
-        // 動的に子要素を追加します。(_posで指定した要素の直前に差し込む)
-        const appendChild = this.appendChild = (_childs, _pos) => {
-           
+        /**
+         * 動的に子要素を追加します。
+         * @param _childs 追加する子要素
+         * @param _pos ここで指定した要素の直前に差し込む
+         * @param keeoPage 要素の追加前後で表示されているページを保持するかどうか
+         */
+        const appendChild = this.appendChild = (_childs, _pos, keeoPage = true) => {
+
             if (_childs.length === 0) {
                 // 追加要素がない場合は何もしない
                 return
@@ -1275,19 +1280,42 @@
                 ul.append(_childs)
             }
 
-            // 表示要素のサイズ調整
-            changeSize();
+            // 表示要素をリセットする
+            reset();
 
-            // 現在位置の左に追加された場合はページを１つ進める
-            if (carousel) {
-                if (_pos <= (pos-shift)) {
-                    changePage(pageNo+1)
+            if (keeoPage) {
+                const _slide = (move) => {
+                    pos = pos + (shift * move);
+
+                    pageNo = pageNo + move;
+                    if (pageNo < 1) {
+                        pageNo = pageNo + maxPageNo;
+                    } else if (maxPageNo < pageNo) {
+                        pageNo = pageNo - maxPageNo;
+                    }
+
+                    const direction = vertical ? 'top' : 'left';
+                    if (1 < maxPageNo && carousel) {
+                        ul.css(direction, '-' + (pos * liwidth) + 'px');
+                    } else {
+                        ul.css(direction, '-' + ((pos - shift) * liwidth) + 'px');
+                    }
                 }
-            } else {
-                if (_pos <= pos) {
-                    changePage(pageNo+1)
+                if (carousel) {
+                    if (_pos <= (pos-shift)) {
+                        // 現在位置の左に追加された場合はページを１つ進める
+                        _slide(1)
+                    }
+                } else {
+                    if (_pos <= pos) {
+                        // 現在位置の左に追加された場合はページを１つ進める
+                        pos = pos + _childs.length
+                        _slide(1)
+                        pos = pos - _childs.length
+                    }
                 }
             }
+
         }
         
         // 処理開始

@@ -98,105 +98,86 @@
             }
 
             // 子要素を生成します。
-            const makeChild = (_pageNo ,callBackFunc) => {
-                _pageNo = parseInt(_pageNo);
+            const makeChild = (pageNo, keepPage, callback) => {
+                pageNo = parseInt(pageNo);
 
-                let index = 0;
-                const callback = () => {
-                    index++
-                    if (index < 3) {
-                        return
+                let page = mainFlame.find('.childKey[zoom-page-no="'+pageNo+'"]');
+                if (0 < page.length) {
+                    if (callback) {
+                        callback(page)
                     }
-                    if (callBackFunc) {
-                        callBackFunc()
-                    }
+                    return
                 }
+                const data = targetItems[pageNo-1]
+                const li = $([
+                    '<li class="childKey" zoom-page-no="'+pageNo+'" style="text-align: center; margin-top: 0">',
+                        '<img src="' + data.imagePath + '" alt="' + data.caption + '" class="' + (data.isMovie ? 'js-movie' : '') + '"/>',
+                    '</li>'
+                ].join(''));
+
+                const index = findAppendPos(pageNo)
                 
-                // 表示するページと前後の３ページ分を生成する
-                [
-                    _pageNo-1,
-                    _pageNo,
-                    _pageNo+1
-                ].forEach((pageNo) => {
-                    if (pageNo <= 0) {
-                        pageNo = targetItems.length;
-                    }
-                    if (targets.length < pageNo) {
-                        pageNo = 1;
-                    }
-                    const page = mainFlame.find('.childKey[zoom-page-no="'+pageNo+'"]');
-                    if (0 < page.length) {
-                        // ページが存在する場合は追加しない
-                        callback();
-                        return
-                    }
-                    const data = targetItems[pageNo-1]
-                    const li = $([
-                        '<li class="childKey" zoom-page-no="'+pageNo+'" style="text-align: center; margin-top: 0">',
-                            '<img src="' + data.imagePath + '" alt="' + data.caption + '" class="' + (data.isMovie ? 'js-movie' : '') + '"/>',
-                        '</li>'
-                    ].join(''));
+                // スライダーを該当ページを追加
+                mainFlame.slider.appendChild(li, index, keepPage);
+                page = mainFlame.find('.childKey[zoom-page-no="'+pageNo+'"]');
 
-                    // 子要素の横幅を端末のwidthに設定
-                    li.width($(window).width());
-                    li.height($(window).height());
+                // 子要素の横幅を端末のwidthに設定
+                page.width($(window).width());
+                page.height($(window).height());
 
-                    const images = li.find('img');
-                    let photoLength = images.length;
-                    images.each(function () {
-                        const photo = $(this),
-                            imagePath = photo.attr('src') || '';
-                        const img = $('<img>');
-                        img.on('load', function () {
+                const images = page.find('img');
+                images.each(function () {
+                    const photo = $(this),
+                        imagePath = photo.attr('src') || '';
+                    const img = $('<img>');
+                    img.on('load', function () {
 
-                            photo.attr('owidth', img[0].width);
-                            photo.attr('oheight', img[0].height);
-                            if (photoLength !== 1) {
-                                photoLength--;
-                                callback();
-                                return;
-                            }
-                            images.unbind('load');
+                        mainFlame.find('.childKey[zoom-page-no="'+pageNo+'"]').attr('owidth', img[0].width);
+                        mainFlame.find('.childKey[zoom-page-no="'+pageNo+'"]').attr('oheight', img[0].height);
 
-                            const index = findAppendPos(pageNo)
-                            // スライダーを該当ページを追加
-                            mainFlame.slider.appendChild(li, index);
+                        images.unbind('load');
 
-                            // 余白の調整
-                            appendMargin(photo);
+                        // 余白の調整
+                        appendMargin(photo);
 
-                            if (photo.hasClass('js-movie')) {
-                                // 画像を動画再生用サムネイルに変換
-                                changeMovieBox(photo);
-                            }
-
-                            callback();
-                        });
-                        img.attr('src', imagePath);
-                    });
-                });
-                
-                // 次のDOMを追加する位置を算出します。
-                const findAppendPos = function (pageNo) {
-                    pageNo = parseInt(pageNo)
-                    const li = mainFlame.slider.find('.childKey').filter(function () {
-                        return !$(this).hasClass('cloned')
-                    });
-                    if (li.length === 0) {
-                        return 0;
-                    }
-                    const index = mainFlame.slider.find('.childKey[zoom-page-no="'+pageNo+'"]').index();
-                    if(index < 0) {
-                        pageNo = pageNo - 1;
-                        if (pageNo === 0) {
-                            return 0;
+                        if (photo.hasClass('js-movie')) {
+                            // 画像を動画再生用サムネイルに変換
+                            changeMovieBox(photo);
                         }
-                        return findAppendPos(pageNo)
-                    }
-                    return index;
-                };
+
+                        if (callback) {
+                            callback(page)
+                        }
+                    });
+                    img.attr('src', imagePath);
+                });
             }
 
+            // 次のDOMを追加する位置を算出します。
+            const findAppendPos = function (pageNo) {
+                const li = mainFlame.find('.childKey').filter(function () {
+                    return !$(this).hasClass('cloned')
+                }).clone();
+                if (li.length === 0) {
+                    return 0;
+                }
+                let index = -1
+                li.each(function (i) {
+                    if ($(this).attr("zoom-page-no") === pageNo+"") {
+                        index = i;
+                        return
+                    }
+                });
+                if(index < 0) {
+                    pageNo = pageNo - 1;
+                    if (pageNo === 0) {
+                        return 0;
+                    }
+                    return findAppendPos(pageNo)
+                }
+                return index+1;
+            };
+            
             // イベントバンドル
             const bindEvents = (mainFlame) => {
 
@@ -216,22 +197,24 @@
                         revertImageFromVideo(mainFlame);
 
                         // ページが存在しない場合は追加
-                        const zoomPageNo = obj.attr('zoom-page-no');
+                        const zoomPageNo = parseInt(obj.attr('zoom-page-no'));
+                        let prevPageNo = zoomPageNo -1;
+                        if (prevPageNo <= 0) {
+                            prevPageNo = targetItems.length
+                        }
+                        let nextPageNo = zoomPageNo +1;
+                        if (targetItems.length < nextPageNo) {
+                            nextPageNo = 1
+                        }
 
-                        // ページが存在しない場合は追加
-                        makeChild(zoomPageNo, function () {
-                            const page = mainFlame.find('.childKey[zoom-page-no="'+zoomPageNo+'"]');
-                            if (0 === page.length) {
-                                // ページが追加されていない場合（ありえない想定）
-                                console.log("Page Not Found!!")
-                                return
-                            }
-                            mainFlame.slider.changePage(pageNo);
+                        // 前ページの追加
+                        makeChild(prevPageNo, true);
 
-                            // キャプションを変更する
-                            changeInfo(zoomPageNo);
-                        });
+                        // 次ページの追加
+                        makeChild(nextPageNo, false);
 
+                        // キャプションを変更する
+                        changeInfo(zoomPageNo);
                     }
                 });
 
@@ -265,13 +248,9 @@
                         const pageNo = $(this).closest('.child').attr('page-no');
 
                         // ページが存在しない場合は追加
-                        makeChild(pageNo, function () {
-                            const page = mainFlame.find('.childKey[zoom-page-no="'+pageNo+'"]');
-                            if (0 === page.length) {
-                                // ページが追加されていない場合（ありえない想定）
-                                console.log("Page Not Found!!")
-                                return
-                            }
+                        makeChild(pageNo, true, function (page) {
+
+                            // スライダーの表示位置を該当ページに切り替える
                             mainFlame.slider.changePage(page.attr('page-no'));
 
                             // キャプションを変更する
@@ -396,11 +375,11 @@
 
             const mainFlame = makeFlame();
 
-            // 1ページ目だけを追加
-            makeChild(1);
-            
             // イベントの設定
             bindEvents(mainFlame);
+            
+            // 1ページ目だけを追加
+            makeChild(1, false);
         };
 
         // 処理開始
