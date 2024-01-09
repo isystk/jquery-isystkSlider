@@ -59,10 +59,12 @@
                 return;
             }
 
+            if (carousel) {
+                pos = shift;
+            }
+
             // 表示要素のサイズ調整
             changeSize();
-
-            pos = shift;
 
             // 各種イベントの設定
             bindEvent();
@@ -117,12 +119,7 @@
             }
 
             // 現在のオフセット位置と移動後のオフセット位置を設定
-            let from = 0;
-            if (carousel) {
-                from = -1 * (pos / shift) * shiftw - dragw;
-            } else {
-                from = -1 * (pos - shift) / shift * shiftw - dragw;
-            }
+            let from = -1 * (pos / shift) * shiftw - dragw;
             const to = from - (shiftw * move) + dragw;
 
             if (from === to) {
@@ -237,10 +234,6 @@
         // カルーセル用に両端に番兵を作成する
         const initCarousel = () => {
             
-            // 既に番兵がある場合はリセット
-            ul.find('.cloned').remove()
-            li = ul.find(childKey);
-
             // 最終ページに空きが出来る場合は空のLIダグを追加する。例）｜○○○｜○○○｜○○○｜○  ｜
             const addSize = li.length % shift;
             if (addSize !== 0) {
@@ -261,7 +254,7 @@
             ul
                 .append(li.clone(true).slice(0, shift).addClass('cloned'))
                 .prepend(li.clone(true).slice(li.length-(shift), li.length).addClass('cloned'))
-                .css(direction, '-' + (liwidth * shift) + 'px');
+                .css(direction, '-' + (liwidth * shift * pageNo) + 'px'); // 左端に追加した番兵の分だけシフトする
 
             // liを再キャッシュ
             li = ul.find(childKey);
@@ -300,6 +293,9 @@
         const changeSize = () => {
             const exec = function () {
 
+                // 既に番兵がある場合はリセット
+                ul.find('.cloned').remove()
+                
                 li = ul.find(params.childKey);
 
                 li.each(function (i) {
@@ -333,9 +329,7 @@
                 // スライド幅＝子要素横幅✕１ページに含まれる子要素の数
                 shiftw = liwidth * shift;
                 // 最大ページ数＝子要素の数÷１ページに含まれる子要素の数
-                maxPageNo = Math.ceil(li.filter(function () {
-                    return !$(this).hasClass('cloned')
-                }).length / shift);
+                maxPageNo = Math.ceil(li.length / shift);
 
                 // １ページの場合はスライド不要の為、カルーセルは強制OFFとする。
                 // if (maxPageNo <= 1) {
@@ -354,6 +348,10 @@
 
                 // ページングボタンの表示制御
                 showArrows();
+
+                if (carousel) {
+                    initCarousel();
+                }
                 
                 if (responsive) {
                     // レスポンシブが有効になっている場合
@@ -367,9 +365,6 @@
                     ul.css(direction, '-' + (liwidth * shift * pos) + 'px');
                 }
 
-                if (carousel) {
-                    initCarousel();
-                }
             };
 
             // 画面が回転された場合
@@ -1251,13 +1246,18 @@
             slide(move, animateType);
         }
 
-        // 動的に子要素を追加します。
+        // 動的に子要素を追加します。(_posで指定した要素の直前に差し込む)
         const appendChild = this.appendChild = (_childs, _pos) => {
+           
+            if (_childs.length === 0) {
+                // 追加要素がない場合は何もしない
+                return
+            }
             
             // 既に番兵がある場合はリセット
             ul.find('.cloned').remove()
             
-            const li = ul.find(childKey);
+            li = ul.find(childKey);
             if (_pos === undefined) {
                 // 追加位置が未指定の場合は最後に追加する
                 _pos = li.length -1;
@@ -1271,18 +1271,23 @@
                     prevLi.before(_childs[reverseIndex]);
                 });
             } else {
-                // 子要素が１つもない場合
+                // 追加位置が未定の場合は後ろに追加
                 ul.append(_childs)
             }
 
             // 表示要素のサイズ調整
             changeSize();
 
-            if (_pos < pos) {
-                // 手前に追加した場合は１ページズレるので補正する
-                changePage(pageNo+1)
+            // 現在位置の左に追加された場合はページを１つ進める
+            if (carousel) {
+                if (_pos <= (pos-shift)) {
+                    changePage(pageNo+1)
+                }
+            } else {
+                if (_pos <= pos) {
+                    changePage(pageNo+1)
+                }
             }
-            
         }
         
         // 処理開始

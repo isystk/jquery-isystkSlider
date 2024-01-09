@@ -121,7 +121,7 @@
                     if (pageNo <= 0) {
                         pageNo = targetItems.length;
                     }
-                    if (targetItems.length < pageNo) {
+                    if (targets.length < pageNo) {
                         pageNo = 1;
                     }
                     const page = mainFlame.find('.childKey[zoom-page-no="'+pageNo+'"]');
@@ -179,13 +179,13 @@
                 // 次のDOMを追加する位置を算出します。
                 const findAppendPos = function (pageNo) {
                     pageNo = parseInt(pageNo)
-                    const li = mainFlame.slider.find('.childKey');
+                    const li = mainFlame.slider.find('.childKey').filter(function () {
+                        return !$(this).hasClass('cloned')
+                    });
                     if (li.length === 0) {
                         return 0;
                     }
-                    const index = mainFlame.slider.find('.childKey[zoom-page-no="'+pageNo+'"]').filter(function () {
-                        return !$(this).hasClass('cloned')
-                    }).index();
+                    const index = mainFlame.slider.find('.childKey[zoom-page-no="'+pageNo+'"]').index();
                     if(index < 0) {
                         pageNo = pageNo - 1;
                         if (pageNo === 0) {
@@ -212,11 +212,26 @@
                     , 'carousel': true
                     , 'slideCallBack': function ({obj, pageNo}) {
 
-                        // キャプションを変更する
-                        changeInfo(pageNo);
-
                         // 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
                         revertImageFromVideo(mainFlame);
+
+                        // ページが存在しない場合は追加
+                        const zoomPageNo = obj.attr('zoom-page-no');
+
+                        // ページが存在しない場合は追加
+                        makeChild(zoomPageNo, function () {
+                            const page = mainFlame.find('.childKey[zoom-page-no="'+zoomPageNo+'"]');
+                            if (0 === page.length) {
+                                // ページが追加されていない場合（ありえない想定）
+                                console.log("Page Not Found!!")
+                                return
+                            }
+                            mainFlame.slider.changePage(pageNo);
+
+                            // キャプションを変更する
+                            changeInfo(zoomPageNo);
+                        });
+
                     }
                 });
 
@@ -252,12 +267,15 @@
                         // ページが存在しない場合は追加
                         makeChild(pageNo, function () {
                             const page = mainFlame.find('.childKey[zoom-page-no="'+pageNo+'"]');
-                            if (0 < page.length) {
-                                mainFlame.slider.changePage(page.attr('page-no'));
-
-                                // キャプションを変更する
-                                changeInfo(pageNo);
+                            if (0 === page.length) {
+                                // ページが追加されていない場合（ありえない想定）
+                                console.log("Page Not Found!!")
+                                return
                             }
+                            mainFlame.slider.changePage(page.attr('page-no'));
+
+                            // キャプションを変更する
+                            changeInfo(pageNo);
                         });
                     });
 
