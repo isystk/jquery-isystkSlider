@@ -56,7 +56,7 @@
             const makeFlame = () => {
 
                 const mainFlame = $([
-                    '<div class="isystk-overlay zoomPhotoPanel">',
+                    '<div class="isystk-overlay zoomPhotoPanel" style="width: 100%; height: 100%">',
                         '<a href="#" class="js-close close"></a>',
                         '<div class="js-slider" style="overflow:hidden;margin 0 auto;background-color: #000;">',
                             '<ul class="parentKey photo_enlarge_imageArea">',
@@ -72,7 +72,8 @@
                                     '<a href="#"></a>' +
                                 '</p>',
                             '</div>',
-                            '<div class="commentArea" style="position: fixed;height: 29%;background: #000;opacity: 0.8;color:#fff;z-index: 10002;box-sizing: border-box;bottom: 0;width: 100%;padding: 10px;">',
+                            '<div class="commentArea" style="position: absolute;height: 29%;background: #000;opacity:' +
+                            ' 0.8;color:#fff;z-index: 10002;box-sizing: border-box;bottom: 0;width: 100%;padding: 10px;">',
                                 '<div class="comment">',
                                     '<p class="caption_txt captionArea"></p>',
                                     '<div style="display: flex;justify-content: center;position:relative;">',
@@ -92,8 +93,6 @@
                 }
                 mainFlame.attr('id', 'zoomSlider' + index);
                 mainFlame.addClass(className);
-                mainFlame.width($(window).width());
-                mainFlame.height($(window).height());
                 
                 $('body').append(mainFlame);
 
@@ -129,6 +128,7 @@
                 page.height($(window).height());
 
                 const images = page.find('img');
+                let imageSize = images.length
                 images.each(function () {
                     const photo = $(this),
                         imagePath = photo.attr('src') || '';
@@ -148,9 +148,12 @@
                             changeMovieBox(photo);
                         }
 
-                        if (callback) {
-                            callback(page)
+                        if (imageSize === 1) {
+                            if (callback) {
+                                callback(page)
+                            }
                         }
+                        imageSize--;
                     });
                     img.attr('src', imagePath);
                 });
@@ -195,13 +198,24 @@
                     , 'animateType': $.fn.isystkSlider.ANIMATE_TYPE.SLIDE
                     , 'carousel': true
                     , 'slideCallBack': function ({obj, pageNo}) {
-                        console.log('slideCallBack')
                         
                         // 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
                         revertImageFromVideo(mainFlame);
 
                         // 現在表示中のページ番号を切り替える
                         currentPageNo = parseInt(obj.attr('zoom-page-no'));
+
+                        let prevPageNo = currentPageNo -1;
+                        if (prevPageNo <= 0) {
+                            prevPageNo = maxPageNo
+                        }
+                        makeChild(prevPageNo);
+
+                        let nextPageNo = currentPageNo +1;
+                        if (maxPageNo < nextPageNo) {
+                            nextPageNo = 1
+                        }
+                        makeChild(nextPageNo);
 
                         // キャプションを変更する
                         changeInfo(currentPageNo);
@@ -262,27 +276,13 @@
                 // 拡大写真パネルスライダー 前ページクリック時
                 mainFlame.find('.js-prevBtn').click(function (e) {
                     e.preventDefault();
-
-                    let prevPageNo = currentPageNo -1;
-                    if (prevPageNo <= 0) {
-                        prevPageNo = maxPageNo
-                    }
-                    makeChild(prevPageNo, function () {
-                        mainFlame.slider.prevPage();
-                    });
+                    mainFlame.slider.prevPage();
                 });
 
                 // 拡大写真パネルスライダー 次ページクリック時
                 mainFlame.find('.js-nextBtn').click(function (e) {
                     e.preventDefault();
-
-                    let nextPageNo = currentPageNo +1;
-                    if (maxPageNo < nextPageNo) {
-                        nextPageNo = 1
-                    }
-                    makeChild(nextPageNo, function () {
-                        mainFlame.slider.nextPage();
-                    });
+                    mainFlame.slider.nextPage();
                 });
             };
 
@@ -307,13 +307,13 @@
 
             // 上下左右に余白を追加する。
             const appendMargin = (photo) => {
-                var oheight = parseInt(photo.attr('oheight')) || 0,
+                const oheight = parseInt(photo.attr('oheight')) || 0,
                     owidth = parseInt(photo.attr('owidth')) || 0,
                     moviePath = photo.data('moviepath') || '',
                     isMovie = (moviePath !== '') ? true : false;
 
                 // 閉じるボタン領域の高さを除いた画面の高さ
-                var panelHeight = $(window).height() -40;
+                const panelHeight = $(window).height() -40;
                 
                 if (!isMovie) {
                     // 画像
@@ -327,10 +327,7 @@
 
                     const x = Math.floor(oheight * $(window).width() / owidth);
                     const margin = Math.floor(($(window).height() - x) / 2);
-                    console.log({
-                        oheight,
-                        owidth
-                    })
+
                     if (0 <= margin) {
                         photo
                             .css('height', '')
@@ -352,7 +349,7 @@
                         photo.closest('.childKey').css('padding-top', '0px');
                     }
                 } else {
-                    var self = photo.next(),
+                    const self = photo.next(),
                         isMovieBox = self.hasClass('movieBox');
 
                     if (isMovieBox) {
@@ -366,18 +363,18 @@
 
                         self.css('margin-left', '');
 
-                        var x = Math.floor(oheight * $(window).width() / owidth);
-                        var margin = Math.floor((panelHeight - x) / 2) || 0;
+                        const x = Math.floor(oheight * $(window).width() / owidth);
+                        const margin = Math.floor((panelHeight - x) / 2) || 0;
                         if (0 <= margin) {
                             self.css('width', '100%');
                             self.find('img').css('width', '100%');
-                            var height = Math.floor(self.width() * oheight / owidth);
+                            const height = Math.floor(self.width() * oheight / owidth);
                             self.css('height', height + 'px');
                             self.find('img').css('height', height + 'px');
                         } else {
                             self.css('height', '100%');
                             self.find('img').css('height', '100%');
-                            var width = Math.floor(self.height() * owidth / oheight);
+                            const width = Math.floor(self.height() * owidth / oheight);
                             self.css('width', width + 'px');
                             self.find('img').css('width', width + 'px');
                         }
@@ -386,7 +383,7 @@
                         if (0 < margin) {
                             photo.closest('.childKey').css('margin-top', margin + 'px');
                         } else {
-                            var marginLeft = Math.floor(($(window).width() - self.width()) / 2);
+                            const marginLeft = Math.floor(($(window).width() - self.width()) / 2);
                             if (0 <= marginLeft) {
                                 self.css('margin-left', marginLeft + 'px');
                             }
@@ -397,15 +394,15 @@
 
                         photo.closest('.childKey').css('margin-top', '');
 
-                        var x = Math.floor(oheight * $(window).width() / owidth);
-                        var margin = Math.floor((panelHeight - x) / 2) || 0;
+                        const x = Math.floor(oheight * $(window).width() / owidth);
+                        const margin = Math.floor((panelHeight - x) / 2) || 0;
                         if (0 <= margin) {
                             self.css('width', '100%');
-                            var height = Math.floor($(window).width() * oheight / owidth);
+                            const height = Math.floor($(window).width() * oheight / owidth);
                             self.css('height', height + 'px');
                         } else {
                             self.css('height', '100%');
-                            var width = Math.floor(panelHeight * owidth / oheight);
+                            const width = Math.floor(panelHeight * owidth / oheight);
                             self.css('width', width + 'px');
                         }
 
