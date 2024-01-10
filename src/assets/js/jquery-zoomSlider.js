@@ -14,7 +14,8 @@
         const init = (obj) => {
 
             const screen = $(obj),
-                targetClass = params.targetClass;
+                targetClass = params.targetClass,
+				vertical = params.vertical;
 
             const targets = screen
                 .find(targetClass)
@@ -194,6 +195,7 @@
                     , 'shift': 1
                     , 'swipe': true
                     , 'zoom': true
+					, 'vertical': vertical
                     , 'responsive': true
                     , 'animateType': $.fn.isystkSlider.ANIMATE_TYPE.SLIDE
                     , 'carousel': true
@@ -316,7 +318,7 @@
                 const panelHeight = $(window).height() - 40;
 
                 if (isMovie) {
-                    // 動画サムネイル
+                    // 動画
 
                     photo.closest('.childKey').css('margin-top', '');
 
@@ -349,7 +351,7 @@
                         }
                     }
                 } else {
-                    // 画像
+                    // 画像・動画サムネイル
 
                     const x = Math.floor(oheight * $(window).width() / owidth);
                     const margin = Math.floor(($(window).height() - x) / 2);
@@ -432,6 +434,7 @@
         'targetClass': 'img' // 拡大する画像要素
         , 'slideCallBack': null // スライド後に処理を行うコールバック(本プラグインで想定していない処理はここでカスタマイズする)
         , 'openCallBack': null // 拡大表示後のコールバック
+		, vertical: false // 縦方向にスライドさせるかどうか
     };
 
 })(jQuery);

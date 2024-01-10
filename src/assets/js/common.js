@@ -68,7 +68,15 @@ $(function () {
     // 拡大画像スライダー
     $('.zoom-slider').each(function () {
         $(this).zoomSlider({
-            'targetClass': 'img.zoom',
+            targetClass: 'img.zoom',
+        });
+    });
+
+    // 拡大画像スライダー（縦方向）
+    $('.zoom-slider-vertical').each(function () {
+        $(this).zoomSlider({
+            targetClass: 'img.zoom',
+            vertical: true
         });
     });
 });
