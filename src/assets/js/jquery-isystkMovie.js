@@ -331,7 +331,7 @@
             });
         }
 
-        obj.each(function() {
+        obj.each(function () {
             new init(this).exec();
         });
 

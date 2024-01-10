@@ -233,7 +233,7 @@
 
         // カルーセル用に両端に番兵を作成する
         const initCarousel = () => {
-            
+
             // 最終ページに空きが出来る場合は空のLIダグを追加する。例）｜○○○｜○○○｜○○○｜○  ｜
             const addSize = li.length % shift;
             if (addSize !== 0) {
@@ -253,7 +253,7 @@
             const direction = vertical ? 'top' : 'left';
             ul
                 .append(li.clone(true).slice(0, shift).addClass('cloned'))
-                .prepend(li.clone(true).slice(li.length-(shift), li.length).addClass('cloned'))
+                .prepend(li.clone(true).slice(li.length - (shift), li.length).addClass('cloned'))
                 .css(direction, '-' + (liwidth * shift * pageNo) + 'px'); // 左端に追加した番兵の分だけシフトする
 
             // liを再キャッシュ
@@ -295,7 +295,7 @@
 
                 // 既に番兵がある場合はリセット
                 ul.find('.cloned').remove()
-                
+
                 li = ul.find(params.childKey);
 
                 li.each(function (i) {
@@ -352,7 +352,7 @@
                 if (carousel) {
                     initCarousel();
                 }
-                
+
                 if (responsive) {
                     // レスポンシブが有効になっている場合
 
@@ -1257,20 +1257,20 @@
                 // 追加要素がない場合は何もしない
                 return
             }
-            
+
             // 既に番兵がある場合はリセット
             ul.find('.cloned').remove()
-            
+
             li = ul.find(childKey);
             if (_pos === undefined) {
                 // 追加位置が未指定の場合は最後に追加する
-                _pos = li.length -1;
+                _pos = li.length - 1;
             }
             // 追加する位置の直前の子要素
             const prevLi = li.get(_pos)
-            
+
             if (prevLi) {
-                _childs.each(function(index) {
+                _childs.each(function (index) {
                     const reverseIndex = _childs.length - 1 - index;
                     prevLi.before(_childs[reverseIndex]);
                 });
@@ -1300,7 +1300,7 @@
                 }
             }
             if (carousel) {
-                if (_pos <= (pos-shift)) {
+                if (_pos <= (pos - shift)) {
                     // 現在位置の左に追加された場合はページを１つ進める
                     _slide(1)
                 }
@@ -1314,7 +1314,7 @@
             }
 
         }
-        
+
         // 処理開始
         $(this).each(function () {
             init(this);

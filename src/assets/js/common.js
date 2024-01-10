@@ -53,12 +53,12 @@ $(function () {
         slider.find('.addPrevBtn').click(function () {
             const ul = slider.find('.addData'),
                 li = ul.find('li').slice(0, 3);
-            slider.appendChild(li, ((nowPage-1)*shift))
+            slider.appendChild(li, ((nowPage - 1) * shift))
         });
         slider.find('.addAfterBtn').click(function () {
             const ul = slider.find('.addData'),
                 li = ul.find('li').slice(0, 3);
-            slider.appendChild(li, (nowPage*shift))
+            slider.appendChild(li, (nowPage * shift))
         });
     });
 
