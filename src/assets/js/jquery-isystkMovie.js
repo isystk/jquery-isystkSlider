@@ -4,7 +4,7 @@
      * 
      * Copyright (c) 2024 iseyoshitaka
      */
-    $.fn.isystkMovie = function (options, callback) {
+    $.fn.isystkMovie = function (options) {
 
         $.fn.isystkMovie.addStyleCmp = false;
 
@@ -160,7 +160,7 @@
                     // 初期音量をMUTEにするかどうか
                     const muted = muteDefault ? 'muted' : '';
 
-                    const video = $(['<video controls="" poster="' + imagePath + '" playsinline disablepictureinpicture controlslist="nodownload" ' + muted + ' >',
+                    const video = $(['<video controls="" poster="' + imagePath + '" playsinline disablePictureInPicture controlslist="nodownload" ' + muted + ' >',
                         '<source src="' + moviePath + '">',
                         '<p>ご利用のブラウザではvideoが利用できません。別ブラウザをご利用下さい</p>',
                         '</video>'].join(''));
