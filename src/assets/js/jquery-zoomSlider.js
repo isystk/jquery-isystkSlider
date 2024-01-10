@@ -30,6 +30,9 @@
                 // 拡大対象が１つもない場合は何もしない。
                 return;
             }
+            
+            const maxPageNo = targets.length
+            let currentPageNo = 1;
 
             /* 対象の画像データを配列に保持する */
             const targetItems = $.makeArray(targets
@@ -98,7 +101,7 @@
             }
 
             // 子要素を生成します。
-            const makeChild = (pageNo, keepPage, callback) => {
+            const makeChild = (pageNo, callback) => {
                 pageNo = parseInt(pageNo);
 
                 let page = mainFlame.find('.childKey[zoom-page-no="'+pageNo+'"]');
@@ -117,8 +120,8 @@
 
                 const index = findAppendPos(pageNo)
                 
-                // スライダーを該当ページを追加
-                mainFlame.slider.appendChild(li, index, keepPage);
+                // スライダーの指定位置に生成した子要素を追加
+                mainFlame.slider.appendChild(li, index);
                 page = mainFlame.find('.childKey[zoom-page-no="'+pageNo+'"]');
 
                 // 子要素の横幅を端末のwidthに設定
@@ -132,8 +135,8 @@
                     const img = $('<img>');
                     img.on('load', function () {
 
-                        mainFlame.find('.childKey[zoom-page-no="'+pageNo+'"]').attr('owidth', img[0].width);
-                        mainFlame.find('.childKey[zoom-page-no="'+pageNo+'"]').attr('oheight', img[0].height);
+                        photo.attr('owidth', img[0].width);
+                        photo.attr('oheight', img[0].height);
 
                         images.unbind('load');
 
@@ -192,29 +195,16 @@
                     , 'animateType': $.fn.isystkSlider.ANIMATE_TYPE.SLIDE
                     , 'carousel': true
                     , 'slideCallBack': function ({obj, pageNo}) {
-
+                        console.log('slideCallBack')
+                        
                         // 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
                         revertImageFromVideo(mainFlame);
 
-                        // ページが存在しない場合は追加
-                        const zoomPageNo = parseInt(obj.attr('zoom-page-no'));
-                        let prevPageNo = zoomPageNo -1;
-                        if (prevPageNo <= 0) {
-                            prevPageNo = targetItems.length
-                        }
-                        let nextPageNo = zoomPageNo +1;
-                        if (targetItems.length < nextPageNo) {
-                            nextPageNo = 1
-                        }
-
-                        // 前ページの追加
-                        makeChild(prevPageNo, true);
-
-                        // 次ページの追加
-                        makeChild(nextPageNo, false);
+                        // 現在表示中のページ番号を切り替える
+                        currentPageNo = parseInt(obj.attr('zoom-page-no'));
 
                         // キャプションを変更する
-                        changeInfo(zoomPageNo);
+                        changeInfo(currentPageNo);
                     }
                 });
 
@@ -248,7 +238,7 @@
                         const pageNo = $(this).closest('.child').attr('page-no');
 
                         // ページが存在しない場合は追加
-                        makeChild(pageNo, true, function (page) {
+                        makeChild(pageNo, function (page) {
 
                             // スライダーの表示位置を該当ページに切り替える
                             mainFlame.slider.changePage(page.attr('page-no'));
@@ -272,13 +262,27 @@
                 // 拡大写真パネルスライダー 前ページクリック時
                 mainFlame.find('.js-prevBtn').click(function (e) {
                     e.preventDefault();
-                    mainFlame.slider.prevPage();
+
+                    let prevPageNo = currentPageNo -1;
+                    if (prevPageNo <= 0) {
+                        prevPageNo = maxPageNo
+                    }
+                    makeChild(prevPageNo, function () {
+                        mainFlame.slider.prevPage();
+                    });
                 });
 
                 // 拡大写真パネルスライダー 次ページクリック時
                 mainFlame.find('.js-nextBtn').click(function (e) {
                     e.preventDefault();
-                    mainFlame.slider.nextPage();
+
+                    let nextPageNo = currentPageNo +1;
+                    if (maxPageNo < nextPageNo) {
+                        nextPageNo = 1
+                    }
+                    makeChild(nextPageNo, function () {
+                        mainFlame.slider.nextPage();
+                    });
                 });
             };
 
@@ -303,35 +307,114 @@
 
             // 上下左右に余白を追加する。
             const appendMargin = (photo) => {
-                const oheight = photo.attr('oheight') || 0,
-                    owidth = photo.attr('owidth') || 0;
+                var oheight = parseInt(photo.attr('oheight')) || 0,
+                    owidth = parseInt(photo.attr('owidth')) || 0,
+                    moviePath = photo.data('moviepath') || '',
+                    isMovie = (moviePath !== '') ? true : false;
+
+                // 閉じるボタン領域の高さを除いた画面の高さ
+                var panelHeight = $(window).height() -40;
                 
-                if (0 < photo.next('video').length) {
-                    // 動画が再生済みの場合
-                    photo = photo.next();
-                }
+                if (!isMovie) {
+                    // 画像
+                    const oheight = photo.attr('oheight') || 0,
+                        owidth = photo.attr('owidth') || 0;
+                    
+                    if (0 < photo.next('video').length) {
+                        // 動画が再生済みの場合
+                        photo = photo.next();
+                    }
 
-                const x = Math.floor(oheight * $(window).width() / owidth);
-                const margin = Math.floor(($(window).height() - x) / 2);
-                if (0 <= margin) {
-                    photo
-                        .css('height', '')
-                        .css('width', '100%')
-                    ;
-                } else {
-                    photo
-                        .css('height', '100%')
-                        .css('width', '')
-                        .css('margin', 'auto');
-                }
-                photo.closest('.childKey').css('padding-top', '');
+                    const x = Math.floor(oheight * $(window).width() / owidth);
+                    const margin = Math.floor(($(window).height() - x) / 2);
+                    console.log({
+                        oheight,
+                        owidth
+                    })
+                    if (0 <= margin) {
+                        photo
+                            .css('height', '')
+                            .css('width', '100%')
+                        ;
+                    } else {
+                        photo
+                            .css('height', '100%')
+                            .css('width', '')
+                            .css('margin', 'auto');
+                    }
+                    photo.closest('.childKey').css('padding-top', '');
 
-                const y = Math.floor(oheight * $(window).width() / owidth);
-                const padding = Math.floor(($(window).height() - y) / 2) || 0;
-                if (0 < padding) {
-                    photo.closest('.childKey').css('padding-top', padding + 'px');
+                    const y = Math.floor(oheight * $(window).width() / owidth);
+                    const padding = Math.floor(($(window).height() - y) / 2) || 0;
+                    if (0 < padding) {
+                        photo.closest('.childKey').css('padding-top', padding + 'px');
+                    } else {
+                        photo.closest('.childKey').css('padding-top', '0px');
+                    }
                 } else {
-                    photo.closest('.childKey').css('padding-top', '0px');
+                    var self = photo.next(),
+                        isMovieBox = self.hasClass('movieBox');
+
+                    if (isMovieBox) {
+                        // 動画サムネイル
+
+                        if (!self.is(':visible')) {
+                            return;
+                        }
+
+                        photo.closest('.childKey').css('margin-top', '');
+
+                        self.css('margin-left', '');
+
+                        var x = Math.floor(oheight * $(window).width() / owidth);
+                        var margin = Math.floor((panelHeight - x) / 2) || 0;
+                        if (0 <= margin) {
+                            self.css('width', '100%');
+                            self.find('img').css('width', '100%');
+                            var height = Math.floor(self.width() * oheight / owidth);
+                            self.css('height', height + 'px');
+                            self.find('img').css('height', height + 'px');
+                        } else {
+                            self.css('height', '100%');
+                            self.find('img').css('height', '100%');
+                            var width = Math.floor(self.height() * owidth / oheight);
+                            self.css('width', width + 'px');
+                            self.find('img').css('width', width + 'px');
+                        }
+                        $.fn.isystkMovie.setPartsPosition(self, self.width(), self.height());
+
+                        if (0 < margin) {
+                            photo.closest('.childKey').css('margin-top', margin + 'px');
+                        } else {
+                            var marginLeft = Math.floor(($(window).width() - self.width()) / 2);
+                            if (0 <= marginLeft) {
+                                self.css('margin-left', marginLeft + 'px');
+                            }
+                        }
+
+                    } else {
+                        // 動画
+
+                        photo.closest('.childKey').css('margin-top', '');
+
+                        var x = Math.floor(oheight * $(window).width() / owidth);
+                        var margin = Math.floor((panelHeight - x) / 2) || 0;
+                        if (0 <= margin) {
+                            self.css('width', '100%');
+                            var height = Math.floor($(window).width() * oheight / owidth);
+                            self.css('height', height + 'px');
+                        } else {
+                            self.css('height', '100%');
+                            var width = Math.floor(panelHeight * owidth / oheight);
+                            self.css('width', width + 'px');
+                        }
+
+                        if (0 < margin) {
+                            photo.closest('.childKey').css('margin-top', margin + 'px');
+                        } else {
+                            photo.closest('.childKey').css('margin-top', '0px');
+                        }
+                    }
                 }
             };
             
@@ -373,13 +456,11 @@
                 });
             }
 
+            // メインフレームを生成
             const mainFlame = makeFlame();
 
             // イベントの設定
             bindEvents(mainFlame);
-            
-            // 1ページ目だけを追加
-            makeChild(1, false);
         };
 
         // 処理開始

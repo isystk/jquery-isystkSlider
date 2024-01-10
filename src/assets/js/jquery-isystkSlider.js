@@ -1250,9 +1250,8 @@
          * 動的に子要素を追加します。
          * @param _childs 追加する子要素
          * @param _pos ここで指定した要素の直前に差し込む
-         * @param keeoPage 要素の追加前後で表示されているページを保持するかどうか
          */
-        const appendChild = this.appendChild = (_childs, _pos, keeoPage = true) => {
+        const appendChild = this.appendChild = (_childs, _pos) => {
 
             if (_childs.length === 0) {
                 // 追加要素がない場合は何もしない
@@ -1283,36 +1282,34 @@
             // 表示要素をリセットする
             reset();
 
-            if (keeoPage) {
-                const _slide = (move) => {
-                    pos = pos + (shift * move);
+            const _slide = (move) => {
+                pos = pos + (shift * move);
 
-                    pageNo = pageNo + move;
-                    if (pageNo < 1) {
-                        pageNo = pageNo + maxPageNo;
-                    } else if (maxPageNo < pageNo) {
-                        pageNo = pageNo - maxPageNo;
-                    }
-
-                    const direction = vertical ? 'top' : 'left';
-                    if (1 < maxPageNo && carousel) {
-                        ul.css(direction, '-' + (pos * liwidth) + 'px');
-                    } else {
-                        ul.css(direction, '-' + ((pos - shift) * liwidth) + 'px');
-                    }
+                pageNo = pageNo + move;
+                if (pageNo < 1) {
+                    pageNo = pageNo + maxPageNo;
+                } else if (maxPageNo < pageNo) {
+                    pageNo = pageNo - maxPageNo;
                 }
+
+                const direction = vertical ? 'top' : 'left';
                 if (carousel) {
-                    if (_pos <= (pos-shift)) {
-                        // 現在位置の左に追加された場合はページを１つ進める
-                        _slide(1)
-                    }
+                    ul.css(direction, '-' + (pos * liwidth) + 'px');
                 } else {
-                    if (_pos <= pos) {
-                        // 現在位置の左に追加された場合はページを１つ進める
-                        pos = pos + _childs.length
-                        _slide(1)
-                        pos = pos - _childs.length
-                    }
+                    ul.css(direction, '-' + ((pos - shift) * liwidth) + 'px');
+                }
+            }
+            if (carousel) {
+                if (_pos <= (pos-shift)) {
+                    // 現在位置の左に追加された場合はページを１つ進める
+                    _slide(1)
+                }
+            } else {
+                if (_pos <= pos) {
+                    // 現在位置の左に追加された場合はページを１つ進める
+                    pos = pos + _childs.length
+                    _slide(1)
+                    pos = pos - _childs.length
                 }
             }
 
