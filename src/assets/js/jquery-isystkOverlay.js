@@ -51,22 +51,20 @@
 
             // パネルの表示位置を調整します。
             const adjustPanelPosition = function () {
-                panel.css('position', 'fixed');
-                // ↓ fixedで固定化したので位置調整はコメントアウト
-                // const h = $(window).height();
-                // const w = $(window).width();
-                // const ph = panel.height();
-                // const pw = panel.width();
-                // let top = $(window).scrollTop() + Math.floor((h - ph) / 2);
-                // if ($(window).height() < panel.height()) {
-                //     top = $(window).scrollTop();
-                // }
-                // let left = $(window).scrollLeft() + Math.floor((w - pw) / 2);
-                // if ($(window).width() < panel.width()) {
-                //     left = 0;
-                // }
-                // panel.css('top', top + 'px');
-                // panel.css('left', left + 'px');
+                const h = $(window).height();
+                const w = $(window).width();
+                const ph = panel.height();
+                const pw = panel.width();
+                let top = $(window).scrollTop() + Math.floor((h - ph) / 2);
+                if ($(window).height() < panel.height()) {
+                    top = $(window).scrollTop();
+                }
+                let left = $(window).scrollLeft() + Math.floor((w - pw) / 2);
+                if ($(window).width() < panel.width()) {
+                    left = 0;
+                }
+                panel.css('top', top + 'px');
+                panel.css('left', left + 'px');
             }
             $(window).resize(function () {
                 adjustPanelPosition();

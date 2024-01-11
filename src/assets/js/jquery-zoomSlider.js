@@ -57,7 +57,7 @@
             const makeFlame = () => {
 
                 const mainFlame = $([
-                    '<div class="isystk-overlay zoomPhotoPanel" style="width: 100%; height: 100%">',
+                    '<div class="isystk-overlay zoomPhotoPanel" style="width: 100%; height: 100%; position: fixed">',
                     '<a href="#" class="js-close close"></a>',
                     '<div class="js-slider" style="overflow:hidden;margin 0 auto;background-color: #000;">',
                     '<ul class="parentKey photo_enlarge_imageArea">',
@@ -96,6 +96,11 @@
                 mainFlame.addClass(className);
 
                 $('body').append(mainFlame);
+
+                // 拡大パネル自体のスワイプによる拡大・縮小処理を殺す
+                mainFlame[0].addEventListener('touchmove', function(e) {
+                    e.preventDefault();
+                });
 
                 return mainFlame;
             }
@@ -263,7 +268,7 @@
                             changeInfo(pageNo);
                         });
                     });
-
+                            
                     // オーバーレイの設定
                     target
                         .attr('data-panel', '#' + mainFlame.attr('id'))
@@ -272,7 +277,7 @@
                                 // 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
                                 revertImageFromVideo(mainFlame);
                             }
-                        });
+                    });
                 });
 
                 // 拡大写真パネルスライダー 前ページクリック時
@@ -286,6 +291,7 @@
                     e.preventDefault();
                     mainFlame.slider.nextPage();
                 });
+                
             };
 
             // 補足情報を変更します
