@@ -97,11 +97,6 @@
 
                 $('body').append(mainFlame);
 
-                // 拡大パネル自体のスワイプによる拡大・縮小処理を殺す
-                mainFlame[0].addEventListener('touchmove', function(e) {
-                    e.preventDefault();
-                });
-
                 return mainFlame;
             }
 
@@ -266,18 +261,20 @@
 
                             // キャプションを変更する
                             changeInfo(pageNo);
+                            
+                            mainFlame.css('visibility', 'visible')
                         });
                     });
                             
-                    // オーバーレイの設定
-                    target
-                        .attr('data-panel', '#' + mainFlame.attr('id'))
-                        .isystkOverlay({
-                            closeCallback: () => {
-                                // 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
-                                revertImageFromVideo(mainFlame);
-                            }
-                    });
+                    // // オーバーレイの設定
+                    // target
+                    //     .attr('data-panel', '#' + mainFlame.attr('id'))
+                    //     .isystkOverlay({
+                    //         closeCallback: () => {
+                    //             // 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
+                    //             revertImageFromVideo(mainFlame);
+                    //         }
+                    // });
                 });
 
                 // 拡大写真パネルスライダー 前ページクリック時
@@ -292,6 +289,15 @@
                     mainFlame.slider.nextPage();
                 });
                 
+				// 拡大写真パネル 閉じるボタンクリック時
+				mainFlame.find('.js-close').click(function(e) {
+					e.preventDefault();
+
+					// 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
+					revertImageFromVideo(mainFlame);
+
+                    mainFlame.css('visibility', 'hidden')
+				});
             };
 
             // 補足情報を変更します
