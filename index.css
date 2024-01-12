@@ -428,6 +428,9 @@ video {
   --tw-backdrop-saturate:  ;
   --tw-backdrop-sepia:  ;
 }
+.visible{
+  visibility: visible;
+}
 .fixed{
   position: fixed;
 }
@@ -623,6 +626,12 @@ body {
 }
 
 /* 拡大パネル */
+.zoomPhotoPanel {
+  background-color: #000;
+  width: 100%;
+  height: 100%;
+}
+
 .zoomPhotoPanel .prev a:before {
   content: "";
   display: inline-block;
