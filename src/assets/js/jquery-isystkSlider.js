@@ -306,7 +306,7 @@
                 ul.css('position', 'relative');
                 if (vertical) {
                     // 縦方向スライドの場合
-                    ul.parent().css('overflow-y', 'hidden');
+                    // ul.parent().css('overflow-y', 'hidden');
                 } else {
                     // 横方向スライドの場合
                     // li.css('float', 'left');
@@ -340,11 +340,21 @@
                 if (vertical) {
                     // 縦方向スライドの場合
                     ul.css('height', shiftw * li.length / shift);
-                    ul.parent().css('height', shiftw);
+                    // ul.parent().css('height', shiftw);
                 } else {
                     // 横方向スライドの場合
                     ul.css('width', shiftw * li.length / shift)
                 }
+
+                // console.log({
+                //     outerH: li.outerHeight(true),
+                //     liheight: li.height(),
+                // 	liwidth,
+                // 	shift,
+                // 	shiftw,
+                // 	pageNo,
+                // 	maxPageNo,
+                // });
 
                 // ページングボタンの表示制御
                 showArrows();

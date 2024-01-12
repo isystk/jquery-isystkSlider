@@ -15,7 +15,8 @@
 
             const screen = $(obj),
                 targetClass = params.targetClass,
-				vertical = params.vertical;
+                vertical = params.vertical,
+                panelHeight = 600; // 子要素のスライドする高さ
 
             const targets = screen
                 .find(targetClass)
@@ -57,19 +58,19 @@
             const makeFlame = () => {
 
                 const mainFlame = $([
-                    '<div class="isystk-overlay zoomPhotoPanel" style="width: 100%; height: 100%; position: fixed">',
+                    '<div class="isystk-overlay zoomPhotoPanel" style="position: fixed;">',
                     '<a href="#" class="js-close close"></a>',
-                    '<div class="js-slider" style="overflow:hidden;margin 0 auto;background-color: #000;">',
+                    '<div class="js-slider" style="height: 100%;margin 0 auto;background-color: #000;">',
                     '<ul class="parentKey photo_enlarge_imageArea">',
                     '</ul>',
                     '</div>',
                     '<div class="photo_enlarge_partsArea">',
                     '<div class="transitionArea transitionList">',
-                    '<p class="item prev js-prevBtn" style="position: absolute; top: 52%; left: 5px;' +
+                    '<p class="item prev js-prevBtn" style="position: absolute; top: 50%; left: 5px;' +
                     ' margin-top: -20px;">' +
                     '<a href="#"></a>' +
                     '</p>',
-                    '<p class="item next js-nextBtn" style="position: absolute; top: 52%; right: 5px; margin-top: -20px;">' +
+                    '<p class="item next js-nextBtn" style="position: absolute; top: 50%; right: 5px; margin-top: -20px;">' +
                     '<a href="#"></a>' +
                     '</p>',
                     '</div>',
@@ -95,6 +96,15 @@
                 mainFlame.attr('id', 'zoomSlider' + index);
                 mainFlame.addClass(className);
 
+                // スライダーの上部にパディングを追加（画面高さ ー ヘッダ高さ ー マージン ー パネルの高さ）
+                const paddingTop = Math.floor(($(window).height() - 40 - panelHeight) / 2);
+                mainFlame.find('.js-slider').css('padding-top', paddingTop + 'px');
+
+                // 拡大パネル自体のスワイプによる拡大・縮小処理を殺す
+                mainFlame[0].addEventListener('touchmove', function (e) {
+                    e.preventDefault();
+                });
+
                 $('body').append(mainFlame);
 
                 return mainFlame;
@@ -104,7 +114,9 @@
             const makeChild = (pageNo, callback) => {
                 pageNo = parseInt(pageNo);
 
-                let page = mainFlame.find('.childKey[zoom-page-no="' + pageNo + '"]');
+                let page = mainFlame.find('.childKey[zoom-page-no="' + pageNo + '"]').filter(function () {
+                    return !$(this).hasClass('cloned')
+                });
                 if (0 < page.length) {
                     if (callback) {
                         callback(page)
@@ -113,51 +125,48 @@
                 }
                 const data = targetItems[pageNo - 1]
                 const li = $([
-                    '<li class="childKey" zoom-page-no="' + pageNo + '" style="text-align: center; margin-top: 0">',
+                    '<li class="childKey" zoom-page-no="' + pageNo + '" style="text-align: center; margin: 20px 0;">',
                     '<img src="' + data.imagePath + '" alt="' + data.caption + '" class="' + (data.isMovie ? 'js-movie' : '') + '"/>',
                     '</li>'
                 ].join(''));
+
+                // 子要素の横幅を端末のwidthに設定
+                li.width($(window).width());
+                li.height(panelHeight);
 
                 const index = findAppendPos(pageNo)
 
                 // スライダーの指定位置に生成した子要素を追加
                 mainFlame.slider.appendChild(li, index);
-                page = mainFlame.find('.childKey[zoom-page-no="' + pageNo + '"]');
 
-                // 子要素の横幅を端末のwidthに設定
-                page.width($(window).width());
-                page.height($(window).height());
+                const photo = li.find('img'),
+                    imagePath = photo.attr('src') || '';
 
-                const images = page.find('img');
-                let imageSize = images.length
-                images.each(function () {
-                    const photo = $(this),
-                        imagePath = photo.attr('src') || '';
-                    const img = $('<img>');
-                    img.on('load', function () {
+                const img = $('<img>');
+                img.on('load', function () {
 
+                    const children = mainFlame.find('.childKey[zoom-page-no="' + pageNo + '"]');
+                    children.each(function () {
+                        const photo = $(this).find('img')
                         photo.attr('owidth', img[0].width);
                         photo.attr('oheight', img[0].height);
-
-                        images.unbind('load');
-
-                        // 余白の調整
-                        appendMargin(photo);
 
                         if (photo.hasClass('js-movie')) {
                             // 画像を動画再生用サムネイルに変換
                             changeMovieBox(photo);
                         }
 
-                        if (imageSize === 1) {
-                            if (callback) {
-                                callback(page)
-                            }
-                        }
-                        imageSize--;
-                    });
-                    img.attr('src', imagePath);
+                        // 余白の調整
+                        appendMargin(photo);
+                    })
+
+                    img.unbind('load');
+
+                    if (callback) {
+                        callback(children)
+                    }
                 });
+                img.attr('src', imagePath);
             }
 
             // 次のDOMを追加する位置を算出します。
@@ -195,7 +204,7 @@
                     , 'shift': 1
                     , 'swipe': true
                     , 'zoom': true
-					, 'vertical': vertical
+                    , 'vertical': vertical
                     , 'responsive': true
                     , 'animateType': $.fn.isystkSlider.ANIMATE_TYPE.SLIDE
                     , 'carousel': true
@@ -254,18 +263,19 @@
                         const pageNo = $(this).closest('.child').attr('page-no');
 
                         // ページが存在しない場合は追加
-                        makeChild(pageNo, function (page) {
+                        makeChild(pageNo, function (li) {
 
+                            const slidePageNo = parseInt(li.attr('page-no'));
                             // スライダーの表示位置を該当ページに切り替える
-                            mainFlame.slider.changePage(page.attr('page-no'));
+                            mainFlame.slider.changePage(slidePageNo);
 
                             // キャプションを変更する
                             changeInfo(pageNo);
-                            
+
                             mainFlame.css('visibility', 'visible')
                         });
                     });
-                            
+
                     // // オーバーレイの設定
                     // target
                     //     .attr('data-panel', '#' + mainFlame.attr('id'))
@@ -288,16 +298,16 @@
                     e.preventDefault();
                     mainFlame.slider.nextPage();
                 });
-                
-				// 拡大写真パネル 閉じるボタンクリック時
-				mainFlame.find('.js-close').click(function(e) {
-					e.preventDefault();
 
-					// 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
-					revertImageFromVideo(mainFlame);
+                // 拡大写真パネル 閉じるボタンクリック時
+                mainFlame.find('.js-close').click(function (e) {
+                    e.preventDefault();
+
+                    // 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
+                    revertImageFromVideo(mainFlame);
 
                     mainFlame.css('visibility', 'hidden')
-				});
+                });
             };
 
             // 補足情報を変更します
@@ -323,22 +333,17 @@
             const appendMargin = (photo) => {
                 const oheight = parseInt(photo.attr('oheight')) || 0,
                     owidth = parseInt(photo.attr('owidth')) || 0,
-                    moviePath = photo.data('moviepath') || '',
-                    isMovie = (moviePath !== '') ? true : false;
+                    isMovie = photo.hasClass('js-movie');
 
-                // 閉じるボタン領域の高さを除いた画面の高さ
-                const panelHeight = $(window).height() - 40;
-
+                const shifth = panelHeight;
                 if (isMovie) {
-                    // 動画
-
-                    photo.closest('.childKey').css('margin-top', '');
+                    // 動画サムネイル
 
                     const movieBox = photo.next();
                     movieBox.css('margin-left', '');
 
                     const x = Math.floor(oheight * $(window).width() / owidth);
-                    const margin = Math.floor((panelHeight - x) / 2) || 0;
+                    const margin = Math.floor((shifth - x) / 2) || 0;
                     if (0 <= margin) {
                         movieBox.css('width', '100%');
                         movieBox.find('img').css('width', '100%');
@@ -363,10 +368,10 @@
                         }
                     }
                 } else {
-                    // 画像・動画サムネイル
+                    // 画像
 
                     const x = Math.floor(oheight * $(window).width() / owidth);
-                    const margin = Math.floor(($(window).height() - x) / 2);
+                    const margin = Math.floor((shifth - x) / 2);
 
                     if (0 <= margin) {
                         photo
@@ -379,14 +384,11 @@
                             .css('width', '')
                             .css('margin', 'auto');
                     }
-                    photo.closest('.childKey').css('padding-top', '');
 
                     const y = Math.floor(oheight * $(window).width() / owidth);
-                    const padding = Math.floor(($(window).height() - y) / 2) || 0;
+                    const padding = Math.floor((shifth - y) / 2) || 0;
                     if (0 < padding) {
-                        photo.closest('.childKey').css('padding-top', padding + 'px');
-                    } else {
-                        photo.closest('.childKey').css('padding-top', '0px');
+                        photo.css('margin-top', padding + 'px');
                     }
                 }
             };
@@ -431,6 +433,7 @@
 
             // イベントの設定
             bindEvents(mainFlame);
+
         };
 
         // 処理開始
@@ -446,7 +449,7 @@
         'targetClass': 'img' // 拡大する画像要素
         , 'slideCallBack': null // スライド後に処理を行うコールバック(本プラグインで想定していない処理はここでカスタマイズする)
         , 'openCallBack': null // 拡大表示後のコールバック
-		, vertical: false // 縦方向にスライドさせるかどうか
+        , vertical: false // 縦方向にスライドさせるかどうか
     };
 
 })(jQuery);
