@@ -127,7 +127,9 @@
                 const li = $([
                     '<li class="childKey" zoom-page-no="' + pageNo + '" style="text-align: center;margin: 20px 0;' +
                     'position: relative;">',
+                        '<p style="position: absolute;width: 100%;">',
                             '<img src="' + data.imagePath + '" alt="' + data.caption + '" class="' + (data.isMovie ? 'js-movie' : '') + '" />',
+                        '</p>',
                     '</li>'
                 ].join(''));
 
