@@ -33,6 +33,11 @@
                 return;
             }
 
+            // 対象にページ番号を付与する
+            targets.each(function(i) {
+                $(this).attr('page-no', i+1)
+            })
+
             const maxPageNo = targets.length
             let currentPageNo = 1;
 
@@ -113,7 +118,7 @@
             // 子要素を生成します。
             const makeChild = (pageNo, callback) => {
                 pageNo = parseInt(pageNo);
-
+                
                 let page = mainFlame.find('.childKey[zoom-page-no="' + pageNo + '"]').filter(function () {
                     return !$(this).hasClass('cloned')
                 });
@@ -253,7 +258,7 @@
                 });
 
                 // 対象画像クリック時に拡大写真パネルを表示する
-                screen.find(targetClass).each(function () {
+                screen.find(targetClass).each(function (i) {
                     let target = $(this);
 
                     if (target.hasClass('js-movie')) {
@@ -276,6 +281,14 @@
                             changeInfo(pageNo);
 
                             mainFlame.css('visibility', 'visible')
+                            
+							if (params.moviePlay) {
+								// 動画を自動再生する
+								setTimeout(function() {
+									mainFlame.slider.find('.childKey[page-no="'+pageNo+'"]').find('.movieBox ').trigger('click');
+								}, 500);
+							}
+							
                         });
                     });
 
@@ -445,10 +458,11 @@
 
     // デフォルト値
     $.fn.zoomSlider.defaults = {
-        'targetClass': 'img' // 拡大する画像要素
-        , 'slideCallBack': null // スライド後に処理を行うコールバック(本プラグインで想定していない処理はここでカスタマイズする)
-        , 'openCallBack': null // 拡大表示後のコールバック
+        targetClass: 'img' // 拡大する画像要素
+        , slideCallBack: null // スライド後に処理を行うコールバック(本プラグインで想定していない処理はここでカスタマイズする)
+        , openCallBack: null // 拡大表示後のコールバック
         , vertical: false // 縦方向にスライドさせるかどうか
+        , moviePlay: true // 表示すると同時に動画を再生するかどうか
     };
 
 })(jQuery);

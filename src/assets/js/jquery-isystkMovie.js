@@ -34,6 +34,7 @@
             let height = targetImg.height() || 0;
             const playTime = targetImg.data('playtime') || '';
             const isPlay = targetImg.hasClass('play');
+            const isModalPlay = targetImg.hasClass('modal-play');
             const imagePath = targetImg.attr('osrc') || targetImg.attr('src') || '';
             let video = null;
             const movieBox = $(['<div class="movieBox" >',
@@ -51,6 +52,7 @@
 
                 const moviePath = imagePath
                     .replace(/images/g, 'movies')
+                    .replace(/_sd/g, '')
                     .replace(/\.jpg/, '.mp4');
                 targetImg.data('moviepath', moviePath);
 
@@ -88,6 +90,20 @@
                 targetImg.hide();
                 targetImg.addClass('movie-end');
 
+                // 動画サムネイルをクリックした際にモーダルで動画を表示する。
+                if (isModalPlay) {
+                    const targetImgParent = targetImg.parent();
+                    targetImgParent.find('.movieBox').find('img').addClass('zoom');
+                    targetImgParent.find('.movieBox').find('img').addClass('js-movie');
+                    targetImgParent.find('.movieBox').parent().attr('page-no', 1);
+                    targetImgParent.zoomSlider({
+                        targetClass: 'img.zoom',
+                        vertical: true,
+                        moviePlay: true,
+                        carousel: false,
+                    });
+                }
+                
                 if (0 < width && height <= 0) {
                     // 表示サイズの調整
                     const img = $('<img>');
