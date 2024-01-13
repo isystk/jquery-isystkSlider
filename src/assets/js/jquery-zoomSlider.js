@@ -125,8 +125,11 @@
                 }
                 const data = targetItems[pageNo - 1]
                 const li = $([
-                    '<li class="childKey" zoom-page-no="' + pageNo + '" style="text-align: center; margin: 20px 0;">',
-                    '<img src="' + data.imagePath + '" alt="' + data.caption + '" class="' + (data.isMovie ? 'js-movie' : '') + '"/>',
+                    '<li class="childKey" zoom-page-no="' + pageNo + '" style="text-align: center;margin: 20px 0;' +
+                    'position: relative;">',
+                        '<p style="position: absolute;width: 100%;">',
+                            '<img src="' + data.imagePath + '" alt="' + data.caption + '" class="' + (data.isMovie ? 'js-movie' : '') + '" />',
+                        '</p>',
                     '</li>'
                 ].join(''));
 
@@ -335,7 +338,6 @@
                     owidth = parseInt(photo.attr('owidth')) || 0,
                     isMovie = photo.hasClass('js-movie');
 
-                const shifth = panelHeight;
                 if (isMovie) {
                     // 動画サムネイル
 
@@ -343,7 +345,7 @@
                     movieBox.css('margin-left', '');
 
                     const x = Math.floor(oheight * $(window).width() / owidth);
-                    const margin = Math.floor((shifth - x) / 2) || 0;
+                    const margin = Math.floor((panelHeight - x) / 2) || 0;
                     if (0 <= margin) {
                         movieBox.css('width', '100%');
                         movieBox.find('img').css('width', '100%');
@@ -360,7 +362,7 @@
                     $.fn.isystkMovie.setPartsPosition(movieBox, movieBox.width(), movieBox.height());
 
                     if (0 < margin) {
-                        photo.closest('.childKey').css('margin-top', margin + 'px');
+                        photo.closest('.childKey').css('padding-top', margin + 'px');
                     } else {
                         const marginLeft = Math.floor(($(window).width() - movieBox.width()) / 2);
                         if (0 <= marginLeft) {
@@ -371,24 +373,21 @@
                     // 画像
 
                     const x = Math.floor(oheight * $(window).width() / owidth);
-                    const margin = Math.floor((shifth - x) / 2);
+                    const padding = Math.floor((panelHeight - x) / 2);
 
-                    if (0 <= margin) {
+                    if (0 <= padding) {
+                        // 表示領域のアスペクト比に比べて横長の場合
                         photo
                             .css('height', '')
                             .css('width', '100%')
                         ;
-                    } else {
-                        photo
-                            .css('height', '100%')
-                            .css('width', '')
-                            .css('margin', 'auto');
-                    }
-
-                    const y = Math.floor(oheight * $(window).width() / owidth);
-                    const padding = Math.floor((shifth - y) / 2) || 0;
-                    if (0 < padding) {
                         photo.css('margin-top', padding + 'px');
+                    } else {
+                        // 表示領域のアスペクト比に比べて縦長の場合
+                        photo
+                            .css('height', panelHeight + 'px')
+                            .css('width', '')
+                            .css('margin-y', 'auto');
                     }
                 }
             };

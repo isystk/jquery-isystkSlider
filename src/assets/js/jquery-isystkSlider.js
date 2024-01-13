@@ -346,16 +346,6 @@
                     ul.css('width', shiftw * li.length / shift)
                 }
 
-                // console.log({
-                //     outerH: li.outerHeight(true),
-                //     liheight: li.height(),
-                // 	liwidth,
-                // 	shift,
-                // 	shiftw,
-                // 	pageNo,
-                // 	maxPageNo,
-                // });
-
                 // ページングボタンの表示制御
                 showArrows();
 
@@ -627,7 +617,7 @@
                     const target = $(this),
                         img = target.find('img');
 
-                    img.css('position', '');
+                    img.css('position', '')
                     img.css('top', '');
                     img.css('left', '');
                     img.closest(childKey).css('text-align', 'center');
@@ -675,8 +665,6 @@
 
                     let target = $(this),
                         img = target.find('img'),
-                        owidth = parseInt(img.attr('owidth'), 10),
-                        oheight = parseInt(img.attr('oheight'), 10),
                         pageX1 = 0,
                         pageY1 = 0,
                         pageX2 = 0,
@@ -689,11 +677,9 @@
                         return;
                     }
 
-                    target.css('overflow', 'hidden');
                     let touchstart_bar = 0;
                     let multiTap = false; // 指2本でタップしているかどうか
                     let doubleTap = false; // ダブルクリックしているかどうか
-                    let nowMoving = false;
                     let tapCount = 0;
 
                     if (!target.hasClass('bind_touchstart')) {
