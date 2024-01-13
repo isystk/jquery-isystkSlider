@@ -595,46 +595,38 @@
 
         // 画像のピンチアウトによる拡大・縮小を可能にする
         const zoomImage = this.zoomImage = new (function () {
-            var initZoom = 1;
-            var moveX = 0;
-            var moveY = 0;
-            var zoom = 1;
-            var zoomUpRate = 1;
-            var zoomDownRate = 1;
-            var beforeMoveX = 0;
-            var beforeMoveY = 0;
-            var beforeZoom = 1;
-            var pinchOutLoading = false; // ピンチアウト中どうか
-            var pinchOutLeftMax = false; // ピンチアウトにて左端を表示中
-            var pinchOutRightMax = false; // ピンチアウトにて右端を表示中
 
-            var isPinchOutLoading = this.isPinchOutLoading = function() {
-                return pinchOutLoading;
-            }
+            let initZoom = 1;
+            let moveX = 0;
+            let moveY = 0;
+            let zoom = 1;
+            let zoomUpRate = 1;
+            let zoomDownRate = 1;
+            let beforeMoveX = 0;
+            let beforeMoveY = 0;
+            let beforeZoom = 1;
+            let zoomImageLoading = false; // ピンチアウト中どうか
+            let zoomImageLeftMax = false; // ピンチアウトにて左端を表示中
+            let zoomImageRightMax = false; // ピンチアウトにて右端を表示中
 
             // ピンチアウトでリサイズした画像を元の状態に戻す。
-            var resetImage = this.resetImage = function() {
+            const resetImage = this.resetImage = function () {
 
-                ul.find('.childKey').each(function() {
+                ul.find(childKey).each(function () {
 
-                    var target = $(this),
+                    const target = $(this),
                         img = target.find('img');
 
-                    // 動画は対象外
-                    if (target.find('.targetMovie').length !== 0) {
-                        return;
-                    }
-
-                    img.css('position', '');
+                    img.css('position', '')
                     img.css('top', '');
                     img.css('left', '');
-                    img.closest('.childKey').css('text-align', 'center');
+                    img.closest(childKey).css('text-align', 'center');
 
                     img.css({
                         'transform-origin': '',
-                        '-webkit-transform-origin':  '',
-                        '-moz-transform-origin':  '',
-                        '-ms-transform-origin':  ''
+                        '-webkit-transform-origin': '',
+                        '-moz-transform-origin': '',
+                        '-ms-transform-origin': ''
                     });
                     img.css({
                         'transition': '',
@@ -649,7 +641,7 @@
                         '-ms-transform': ''
                     });
 
-                    img.removeClass('js-pinchOut');
+                    img.removeClass('js-zoomImage');
 
                 });
 
@@ -662,19 +654,17 @@
                 beforeMoveX = 0;
                 beforeMoveY = 0;
                 beforeZoom = 1;
-                pinchOutLoading = false;
-                pinchOutLeftMax = false;
-                pinchOutRightMax = false;
+                zoomImageLoading = false;
+                zoomImageLeftMax = false;
+                zoomImageRightMax = false;
             };
 
-            this.init = function() {
+            this.init = function () {
 
-                ul.find('.childKey').each(function() {
+                ul.find(childKey).each(function () {
 
-                    var target = $(this),
+                    let target = $(this),
                         img = target.find('img'),
-                        owidth = parseInt(img.attr('owidth'), 10),
-                        oheight = parseInt(img.attr('oheight'), 10),
                         pageX1 = 0,
                         pageY1 = 0,
                         pageX2 = 0,
@@ -687,40 +677,35 @@
                         return;
                     }
 
-                    // デバック用 TODO 何故かCloneしたLIには表示されない。
-//					target.append( $('<div class="debugText">☆</div>').css('position', 'relative').css('background-color', '#ffffff').css('width', '100px'));
-
-                    target.css('overflow', 'hidden');
-                    var touchstart_bar = 0;
-                    var multiTap = false; // 指2本でタップしているかどうか
-                    var doubleTap = false; // ダブルクリックしているかどうか
-                    var nowMoving = false;
-                    var tapCount = 0 ;
+                    let touchstart_bar = 0;
+                    let multiTap = false; // 指2本でタップしているかどうか
+                    let doubleTap = false; // ダブルクリックしているかどうか
+                    let tapCount = 0;
 
                     if (!target.hasClass('bind_touchstart')) {
                         target.addClass('bind_touchstart');
 
                         //タッチの場合
-                        target[0].addEventListener('touchstart',function(e){
+                        target[0].addEventListener('touchstart', function (e) {
 
-                            if (!img.hasClass('js-pinchOut')) {
+                            if (!img.hasClass('js-zoomImage')) {
                                 initWidth = img.width();
                                 initHeight = img.height();
                             }
-                            img.addClass('js-pinchOut');
+                            img.addClass('js-zoomImage');
 
-                            if(e.touches.length === 1){
+                            if (e.touches.length === 1) {
 
                                 multiTap = false;
-                                ++tapCount ;
+                                ++tapCount;
 
                                 // ダブルタップ判定
-                                if( tapCount === 2) {
+                                if (tapCount === 2) {
 
-                                    setTimeout( function() {
+                                    setTimeout(function () {
 
                                         if (tapCount !== 2) {
-                                            tapCount = 0 ;
+                                            tapCount = 0;
                                             return;
                                         }
 
@@ -732,13 +717,13 @@
                                         img.css('position', 'fixed');
                                         img.css('top', (($(window).height() - initHeight) / 2) + 'px');
                                         img.css('left', (($(window).width() - initWidth) / 2) + 'px');
-                                        img.closest('.childKey').css('text-align', '');
+                                        img.closest(childKey).css('text-align', '');
 
                                         if (1 < zoom) {
-                                            moveX=0;
-                                            moveY=0;
+                                            moveX = 0;
+                                            moveY = 0;
                                             zoom = 1;
-                                            pinchOutLoading = false;
+                                            zoomImageLoading = false;
                                         } else {
                                             // 縦長かどうか
                                             var isVertical = ($(window).width() < $(window).height());
@@ -747,28 +732,33 @@
                                             } else {
                                                 zoom = $(window).width() / initWidth;
                                             }
-                                            pinchOutLoading = true;
+                                            zoomImageLoading = true;
                                         }
 
-                                        imageTransform(img, {initZoom: initZoom, moveX:moveX, moveY:moveY, zoom: zoom}, true)
+                                        imageTransform(img, {
+                                            initZoom: initZoom,
+                                            moveX: moveX,
+                                            moveY: moveY,
+                                            zoom: zoom
+                                        }, true)
 
                                         if (zoom === 1) {
-                                            setTimeout( function() {
+                                            setTimeout(function () {
                                                 img.css('position', '');
                                                 img.css('top', '');
                                                 img.css('left', '');
-                                                img.closest('.childKey').css('text-align', 'center');
-                                            }, 150 ) ;
+                                                img.closest(childKey).css('text-align', 'center');
+                                            }, 150);
                                         }
 
-                                        tapCount = 0 ;
-                                    }, 100 );
+                                        tapCount = 0;
+                                    }, 100);
 
                                 } else {
                                     doubleTap = false;
-                                    setTimeout( function() {
-                                        tapCount = 0 ;
-                                    }, 300 );
+                                    setTimeout(function () {
+                                        tapCount = 0;
+                                    }, 300);
                                 }
 
                             } else {
@@ -778,10 +768,10 @@
                                 img.css('position', 'fixed');
                                 img.css('top', (($(window).height() - initHeight) / 2) + 'px');
                                 img.css('left', (($(window).width() - initWidth) / 2) + 'px');
-                                img.closest('.childKey').css('text-align', '');
+                                img.closest(childKey).css('text-align', '');
 
                                 multiTap = true;
-                                pinchOutLoading = true;
+                                zoomImageLoading = true;
                                 nowLoading = false;
                                 initZoom = zoom;
 
@@ -795,23 +785,23 @@
                                     multiTap = false;
                                 }
 
-                                imageTransform(img, {initZoom: initZoom, moveX:moveX, moveY:moveY, zoom: zoom}, false)
+                                imageTransform(img, {initZoom: initZoom, moveX: moveX, moveY: moveY, zoom: zoom}, false)
 
                                 var isCenterZoom = true;
                                 if (isCenterZoom) {
                                     // 常に画像の中心を軸として拡大・縮小を行う
                                     img.css({
                                         'transform-origin': 50 + '% ' + 50 + '%',
-                                        '-webkit-transform-origin':  50 + '% ' + 50 + '%',
-                                        '-moz-transform-origin':  50 + '% ' + 50 + '%',
-                                        '-ms-transform-origin':  50 + '% ' + 50 + '%'
+                                        '-webkit-transform-origin': 50 + '% ' + 50 + '%',
+                                        '-moz-transform-origin': 50 + '% ' + 50 + '%',
+                                        '-ms-transform-origin': 50 + '% ' + 50 + '%'
                                     });
                                 } else {
                                     // ピンチアウトした中心を軸として拡大・縮小を行う
 
                                     // ピンチの中心座標を取得
-                                    var tapX = Math.abs(parseInt(e.touches[1].clientX ) + parseInt(e.touches[0].clientX )) / 2;
-                                    var tapY = Math.abs(parseInt(e.touches[1].clientY ) + parseInt(e.touches[0].clientY )) / 2;
+                                    var tapX = Math.abs(parseInt(e.touches[1].clientX) + parseInt(e.touches[0].clientX)) / 2;
+                                    var tapY = Math.abs(parseInt(e.touches[1].clientY) + parseInt(e.touches[0].clientY)) / 2;
 
                                     // 現在の画像サイズ
                                     var nowWidth = Math.floor(initWidth * zoom);
@@ -835,42 +825,36 @@
                                     });
                                     img.css({
                                         'transform-origin': posPerX + '% ' + posPerY + '%',
-                                        '-webkit-transform-origin':  posPerX + '% ' + posPerY + '%',
-                                        '-moz-transform-origin':  posPerX + '% ' + posPerY + '%',
-                                        '-ms-transform-origin':  posPerX + '% ' + posPerY + '%'
+                                        '-webkit-transform-origin': posPerX + '% ' + posPerY + '%',
+                                        '-moz-transform-origin': posPerX + '% ' + posPerY + '%',
+                                        '-ms-transform-origin': posPerX + '% ' + posPerY + '%'
                                     });
-
-//										target.find('.debugText').text('posPerX:' + posPerX + '/posPerY:' + posPerY);
-
                                 }
-
                             }
 
-                            pageX1= e.touches[0].pageX;
-                            pageY1= e.touches[0].pageY;
-                            if(multiTap){
+                            pageX1 = e.touches[0].pageX;
+                            pageY1 = e.touches[0].pageY;
+                            if (multiTap) {
                                 pageX2 = e.touches[1].pageX;
                                 pageY2 = e.touches[1].pageY;
                             }
 
-                        },false);
+                        }, false);
                     }
-
 
                     if (!target.hasClass('bind_touchmove')) {
                         target.addClass('bind_touchmove');
 
                         //ムーブの場合
-                        target[0].addEventListener('touchmove', function(e) {
+                        target[0].addEventListener('touchmove', function (e) {
 
-                            if (!pinchOutLoading) {
+                            if (!zoomImageLoading) {
                                 return;
                             }
 
-                            if(!multiTap){
+                            if (!multiTap) {
 
                                 //1本指だったら移動
-
                                 var x = (pageX1 - e.touches[0].pageX);
                                 var y = (pageY1 - e.touches[0].pageY);
 
@@ -879,7 +863,7 @@
                                 var nowHeight = Math.floor(initHeight * zoom);
 
                                 var isSlideMove = false;
-                                if (pinchOutLoading && !(pinchOutLeftMax && ((nowWidth - $(window).width()) / 2) < moveX) && !(pinchOutRightMax && moveX < (-1 * (nowWidth - $(window).width()) / 2))) {
+                                if (zoomImageLoading && !(zoomImageLeftMax && ((nowWidth - $(window).width()) / 2) < moveX) && !(zoomImageRightMax && moveX < (-1 * (nowWidth - $(window).width()) / 2))) {
                                     event.preventDefault();
                                     event.stopPropagation();
                                 } else {
@@ -902,11 +886,11 @@
                                     }
                                 }
 
-                                imageTransform(img, {initZoom: initZoom, moveX:moveX, moveY:moveY, zoom: zoom}, false)
+                                imageTransform(img, {initZoom: initZoom, moveX: moveX, moveY: moveY, zoom: zoom}, false)
 
                             } else {
 
-                                if (pinchOutLoading) {
+                                if (zoomImageLoading) {
                                     event.preventDefault();
                                     event.stopPropagation();
                                 }
@@ -922,7 +906,7 @@
 
                                 var maxRate = 3;
                                 var minRate = 0.1;
-                                if(1 < diff){
+                                if (1 < diff) {
                                     zoom *= ((1 + diff) / 2);
                                     // 最大3倍
                                     if (maxRate < zoom) {
@@ -932,8 +916,7 @@
                                     if (initZoom === 1 && 1 < zoom) {
                                         initZoom = 1.1;
                                     }
-                                }
-                                else if(diff < 1){
+                                } else if (diff < 1) {
                                     zoom *= ((1 + diff) / 2);
                                     // 最小1倍
                                     if (zoom < minRate) {
@@ -952,7 +935,12 @@
                                     // 何もしない
                                 } else {
 
-                                    imageTransform(img, {initZoom: initZoom, moveX:moveX, moveY:moveY, zoom: zoom}, false)
+                                    imageTransform(img, {
+                                        initZoom: initZoom,
+                                        moveX: moveX,
+                                        moveY: moveY,
+                                        zoom: zoom
+                                    }, false)
 
                                 }
 
@@ -963,7 +951,7 @@
                             // 位置 X,Y 座標を覚えておく
                             pageX1 = e.touches[0].pageX;
                             pageY1 = e.touches[0].pageY;
-                            if(multiTap){
+                            if (multiTap) {
                                 pageX2 = e.touches[1].pageX;
                                 pageY2 = e.touches[1].pageY;
                             }
@@ -975,9 +963,10 @@
                         target.addClass('bind_touchend');
 
                         //タッチの終了
-                        target[0].addEventListener('touchend', touchendEvent,false);
-                        target[0].addEventListener('touchcancel', touchendEvent,false);
-                        function touchendEvent(e){
+                        target[0].addEventListener('touchend', touchendEvent, false);
+                        target[0].addEventListener('touchcancel', touchendEvent, false);
+
+                        function touchendEvent(e) {
 
                             // 変化がない場合は何もしない。
                             if (beforeMoveX === moveX && beforeMoveY === moveY && beforeZoom === zoom) {
@@ -988,8 +977,8 @@
                             var nowWidth = Math.floor(initWidth * zoom);
                             var nowHeight = Math.floor(initHeight * zoom);
 
-                            pinchOutLeftMax = false;
-                            pinchOutRightMax = false;
+                            zoomImageLeftMax = false;
+                            zoomImageRightMax = false;
 
                             // 縦長かどうか
                             var isVertical = ($(window).width() < $(window).height());
@@ -999,15 +988,15 @@
                                 // 画面から画像がはみ出した際のリバウンド処理
                                 if (zoom === 1) {
                                     // スライダー可能にする。
-                                    pinchOutLeftMax = true;
-                                    pinchOutRightMax = true;
-                                } else  if (((nowWidth - $(window).width()) / 2) < moveX) {
+                                    zoomImageLeftMax = true;
+                                    zoomImageRightMax = true;
+                                } else if (((nowWidth - $(window).width()) / 2) < moveX) {
                                     // 画面左にはみ出した場合
 
                                     moveX = ((nowWidth - $(window).width()) / 2);
 
                                     // スライダー可能にする。
-                                    pinchOutLeftMax = true;
+                                    zoomImageLeftMax = true;
 
                                 } else if (moveX < (-1 * (nowWidth - $(window).width()) / 2)) {
                                     // 画面右にはみ出した場合
@@ -1015,7 +1004,7 @@
                                     moveX = (-1 * (nowWidth - $(window).width()) / 2);
 
                                     // スライダー可能にする。
-                                    pinchOutRightMax = true;
+                                    zoomImageRightMax = true;
 
                                 } else if ($(window).height() < nowHeight) {
                                     // 画面上下にはみ出した場合
@@ -1030,7 +1019,7 @@
 
                                         moveY = ((nowHeight - $(window).height()) / 2);
 
-                                    } else  if (moveY < (-1 * (nowHeight - $(window).height()) / 2)) {
+                                    } else if (moveY < (-1 * (nowHeight - $(window).height()) / 2)) {
                                         // 画面上にはみ出した場合
 
                                         moveY = (-1 * (nowHeight - $(window).height()) / 2);
@@ -1045,16 +1034,16 @@
                                     zoom = 1;
                                     moveX = 0;
                                     moveY = 0;
-                                    pinchOutLeftMax = true;
-                                    pinchOutRightMax = true;
+                                    zoomImageLeftMax = true;
+                                    zoomImageRightMax = true;
                                 }
 
 
                             } else {
 
                                 // スライダー可能にする。
-                                pinchOutLeftMax = true;
-                                pinchOutRightMax = true;
+                                zoomImageLeftMax = true;
+                                zoomImageRightMax = true;
 
                                 // 画面から画像がはみ出した際のリバウンド処理
                                 if (((nowHeight - $(window).height()) / 2) < moveY) {
@@ -1069,7 +1058,7 @@
                                         moveY = 0;
                                     }
 
-                                } else  if (moveY < (-1 * (nowHeight - $(window).height()) / 2)) {
+                                } else if (moveY < (-1 * (nowHeight - $(window).height()) / 2)) {
                                     // 画面上にはみ出した場合
 
                                     moveY = (-1 * (nowHeight - $(window).height()) / 2);
@@ -1090,16 +1079,16 @@
 
                             }
 
-                            imageTransform(img, {initZoom: initZoom, moveX:moveX, moveY:moveY, zoom: zoom}, true)
+                            imageTransform(img, {initZoom: initZoom, moveX: moveX, moveY: moveY, zoom: zoom}, true)
 
                             if (zoom === 1) {
-                                setTimeout( function() {
+                                setTimeout(function () {
                                     img.css('position', '');
                                     img.css('top', '');
                                     img.css('left', '');
-                                    img.closest('.childKey').css('text-align', 'center');
-                                    pinchOutLoading = false;
-                                }, 150 ) ;
+                                    img.closest(childKey).css('text-align', 'center');
+                                    zoomImageLoading = false;
+                                }, 150);
                             }
 
                             // 前回の状態を保持しておく
@@ -1116,35 +1105,33 @@
 
             };
 
-            var imageTransform = function(img, obj, isAnimate) {
+            const imageTransform = (img, obj, isAnimate) => {
 
                 if (isAnimate) {
                     img.css({
-                        'transition':'-webkit-transform 150ms cubic-bezier(0,0,0.25,1)',
-                        '-webkit-transition':'-webkit-transform 150ms cubic-bezier(0,0,0.25,1)',
-                        '-moz-transition':'-webkit-transform 150ms cubic-bezier(0,0,0.25,1)',
-                        '-ms-transition':'-webkit-transform 150ms cubic-bezier(0,0,0.25,1)'
+                        'transition': '-webkit-transform 150ms cubic-bezier(0,0,0.25,1)',
+                        '-webkit-transition': '-webkit-transform 150ms cubic-bezier(0,0,0.25,1)',
+                        '-moz-transition': '-webkit-transform 150ms cubic-bezier(0,0,0.25,1)',
+                        '-ms-transition': '-webkit-transform 150ms cubic-bezier(0,0,0.25,1)'
                     });
                 } else {
                     img.css({
-                        'transition':'-webkit-transform 0ms',
-                        '-webkit-transition':'-webkit-transform 0ms',
-                        '-moz-transition':'-webkit-transform 0ms',
-                        '-ms-transition':'-webkit-transform 0ms'
+                        'transition': '-webkit-transform 0ms',
+                        '-webkit-transition': '-webkit-transform 0ms',
+                        '-moz-transition': '-webkit-transform 0ms',
+                        '-ms-transition': '-webkit-transform 0ms'
                     });
                 }
 
                 img.css({
-                    'transform': 'translate3d('+obj.moveX+'px, '+obj.moveY+'px, 0px) scale(' + obj.zoom + ')',
-                    '-webkit-transform': 'translate3d('+obj.moveX+'px, '+obj.moveY+'px, 0px) scale(' + obj.zoom + ')',
-                    '-moz-transform': 'translate3d('+obj.moveX+'px, '+obj.moveY+'px, 0px) scale(' + obj.zoom + ')',
-                    '-ms-transform': 'translate3d('+obj.moveX+'px, '+obj.moveY+'px, 0px) scale(' + obj.zoom + ')'
+                    'transform': 'translate3d(' + obj.moveX + 'px, ' + obj.moveY + 'px, 0px) scale(' + obj.zoom + ')',
+                    '-webkit-transform': 'translate3d(' + obj.moveX + 'px, ' + obj.moveY + 'px, 0px) scale(' + obj.zoom + ')',
+                    '-moz-transform': 'translate3d(' + obj.moveX + 'px, ' + obj.moveY + 'px, 0px) scale(' + obj.zoom + ')',
+                    '-ms-transform': 'translate3d(' + obj.moveX + 'px, ' + obj.moveY + 'px, 0px) scale(' + obj.zoom + ')'
                 });
 
-                if (pinchOutCallBack) {
-                    pinchOutCallBack({initZoom: obj.initZoom, zoom : obj.zoom});
-                }
             }
+
         })();
 
         // 自動スライド
