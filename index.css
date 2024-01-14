@@ -715,6 +715,10 @@ body {
   width: 30px;
   height: 30px;
 }
+.isystk-overlay .close.black {
+  background: url(./images/close.png) 0 0 no-repeat;
+  background-size: 100% auto;
+}
 
 .isystk-overlay .next-btn {
   background: url(./images/btn-next.svg) 0 0 no-repeat;
