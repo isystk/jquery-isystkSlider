@@ -304,6 +304,7 @@
 
                 // cssを調整する
                 ul.css('position', 'relative');
+                li.css('overflow', 'hidden');
                 if (vertical) {
                     // 縦方向スライドの場合
                     // ul.parent().css('overflow-y', 'hidden');
@@ -714,7 +715,6 @@
                                         e.preventDefault();
 
                                         // 開始位置を覚えておく
-                                        img.css('position', 'fixed');
                                         img.css('top', (($(window).height() - initHeight) / 2) + 'px');
                                         img.css('left', (($(window).width() - initWidth) / 2) + 'px');
                                         img.closest(childKey).css('text-align', '');

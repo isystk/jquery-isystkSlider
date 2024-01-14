@@ -9,8 +9,8 @@
         $.fn.isystkMovie.addStyleCmp = false;
 
         const params = $.extend({}, $.fn.isystkMovie.defaults, options);
-        
-		let callbackfunc = null,
+
+        let callbackfunc = null,
             clickCallback = null,
             resizeCallback = null,
             playCallback = null,
@@ -22,7 +22,7 @@
 
         // jQueryオブジェクトキャッシュ、初期設定を行う
         const init = function (obj) {
-			callbackfunc = params.callbackfunc;
+            callbackfunc = params.callbackfunc;
             clickCallback = params.clickCallback;
             resizeCallback = params.resizeCallback;
             playCallback = params.playCallback;
@@ -105,7 +105,7 @@
                         carousel: false,
                     });
                 }
-                
+
                 if (0 < width && height <= 0) {
                     // 表示サイズの調整
                     const img = $('<img>');
@@ -119,7 +119,7 @@
                         // アスペクト比からheightを算出
                         height = Math.floor(o_height * width / o_width);
                         setPartsPosition(movieBox, width, height);
-                        
+
                         if (callback) {
                             callback(movieBox);
                         }
@@ -139,7 +139,7 @@
                         // アスペクト比からwidthを算出
                         width = Math.floor(o_width * height / o_height);
                         setPartsPosition(movieBox, width, height);
-                        
+
                         if (callback) {
                             callback(movieBox);
                         }
@@ -157,7 +157,7 @@
                         targetImg.attr('oheight', img[0].height);
 
                         setPartsPosition(movieBox, o_width, o_height);
-                        
+
                         if (callback) {
                             callback(movieBox);
                         }
@@ -175,7 +175,7 @@
                         targetImg.attr('oheight', img[0].height);
 
                         setPartsPosition(movieBox, width, height);
-                        
+
                         if (callback) {
                             callback(movieBox);
                         }
@@ -366,9 +366,9 @@
         }
 
         let maxCount = target.length;
-		const movieBoxs = [];
+        const movieBoxs = [];
         target.each(function () {
-            new init(this).exec(function(movieBox) {
+            new init(this).exec(function (movieBox) {
                 movieBoxs.push(movieBox);
                 maxCount--;
                 if (maxCount === 0 && callbackfunc) {
