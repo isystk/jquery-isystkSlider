@@ -9,8 +9,9 @@
         $.fn.isystkMovie.addStyleCmp = false;
 
         const params = $.extend({}, $.fn.isystkMovie.defaults, options);
-
-        let clickCallback = null,
+        
+		let callbackfunc = null,
+            clickCallback = null,
             resizeCallback = null,
             playCallback = null,
             pauseCallback = null,
@@ -21,6 +22,7 @@
 
         // jQueryオブジェクトキャッシュ、初期設定を行う
         const init = function (obj) {
+			callbackfunc = params.callbackfunc;
             clickCallback = params.clickCallback;
             resizeCallback = params.resizeCallback;
             playCallback = params.playCallback;
@@ -43,7 +45,7 @@
                 '</div>'
             ].join(''));
 
-            this.exec = function exec() {
+            this.exec = function exec(callback) {
 
                 if (targetImg.hasClass('movie-end')) {
                     // 既に処理済みの場合は、二重に設定しないように処理を抜ける
@@ -117,6 +119,10 @@
                         // アスペクト比からheightを算出
                         height = Math.floor(o_height * width / o_width);
                         setPartsPosition(movieBox, width, height);
+                        
+                        if (callback) {
+                            callback(movieBox);
+                        }
                     });
                     img.attr('src', imagePath);
                 } else if (width <= 0 && 0 < height) {
@@ -133,6 +139,10 @@
                         // アスペクト比からwidthを算出
                         width = Math.floor(o_width * height / o_height);
                         setPartsPosition(movieBox, width, height);
+                        
+                        if (callback) {
+                            callback(movieBox);
+                        }
                     });
                     img.attr('src', imagePath);
                 } else if (width <= 0 || height <= 0) {
@@ -147,6 +157,10 @@
                         targetImg.attr('oheight', img[0].height);
 
                         setPartsPosition(movieBox, o_width, o_height);
+                        
+                        if (callback) {
+                            callback(movieBox);
+                        }
                     });
                     img.attr('src', imagePath);
                 } else {
@@ -161,6 +175,10 @@
                         targetImg.attr('oheight', img[0].height);
 
                         setPartsPosition(movieBox, width, height);
+                        
+                        if (callback) {
+                            callback(movieBox);
+                        }
                     });
                     img.attr('src', imagePath);
                 }
@@ -324,7 +342,7 @@
             });
         }
 
-        const obj = $(this);
+        const target = $(this);
 
         // 実機の場合は回転処理、それ以外はリサイズ処理
         if (0 > navigator.userAgent.indexOf('iPhone') && 0 > navigator.userAgent.indexOf('iPad') && 0 > navigator.userAgent.indexOf('iPod') && 0 > navigator.userAgent.indexOf('Android')) {
@@ -347,14 +365,23 @@
             });
         }
 
-        obj.each(function () {
-            new init(this).exec();
+        let maxCount = target.length;
+		const movieBoxs = [];
+        target.each(function () {
+            new init(this).exec(function(movieBox) {
+                movieBoxs.push(movieBox);
+                maxCount--;
+                if (maxCount === 0 && callbackfunc) {
+                    callbackfunc(movieBoxs);
+                }
+            });
         });
 
         return this;
     }
 
     $.fn.isystkMovie.defaults = {
+        callbackfunc: null,
         clickCallback: null,
         resizeCallback: null,
         playCallback: null,

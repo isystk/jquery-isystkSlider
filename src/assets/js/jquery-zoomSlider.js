@@ -159,13 +159,14 @@
                         photo.attr('owidth', img[0].width);
                         photo.attr('oheight', img[0].height);
 
+                        // 余白の調整
+                        appendMargin(photo);
+
                         if (photo.hasClass('js-movie')) {
                             // 画像を動画再生用サムネイルに変換
                             changeMovieBox(photo);
                         }
 
-                        // 余白の調整
-                        appendMargin(photo);
                     })
 
                     img.unbind('load');
@@ -348,61 +349,76 @@
             // 上下左右に余白を追加する。
             const appendMargin = (photo) => {
                 const oheight = parseInt(photo.attr('oheight')) || 0,
-                    owidth = parseInt(photo.attr('owidth')) || 0,
-                    isMovie = photo.hasClass('js-movie');
+					owidth = parseInt(photo.attr('owidth')) || 0,
+					moviePath = photo.data('moviepath') || '',
+					isMovie = (moviePath !== '') ? true : false;
+	
+				if (!isMovie) {
+					// 画像
 
-                if (isMovie) {
-                    // 動画サムネイル
+					const x = Math.floor(photo.height() * $(window).width() / photo.width());
+					const margin = Math.floor((panelHeight - x) / 2) || 0;
+                    
+					photo.css('margin', 'auto');
+					photo.css('margin-top', '0');
+					if (0 < margin) {
+						photo.css('margin-top', margin + 'px');
+					}
 
-                    const movieBox = photo.next();
-                    movieBox.css('margin-left', '');
+					if (!photo.hasClass('js-pinchOut')) {
+						const x = Math.floor(oheight * $(window).width() / owidth);
+						const margin = Math.floor((panelHeight - x) / 2) || 0;
+						if (0 <= margin) {
+							photo.css('width', '100%');
+							const height = Math.floor($(window).width() * oheight / owidth);
+							photo.css('height', height + 'px');
+						} else {
+							photo.css('height', '100%');
+							const width = Math.floor(panelHeight * owidth / oheight);
+							photo.css('width', width + 'px');
+						}
+					}
+	
+				} else {
+					// 動画
+					
+					const self = photo.next(),
+						isMovieBox = self.hasClass('movieBox');
 
-                    const x = Math.floor(oheight * $(window).width() / owidth);
-                    const margin = Math.floor((panelHeight - x) / 2) || 0;
-                    if (0 <= margin) {
-                        movieBox.css('width', '100%');
-                        movieBox.find('img').css('width', '100%');
-                        const height = Math.floor(movieBox.width() * oheight / owidth);
-                        movieBox.css('height', height + 'px');
-                        movieBox.find('img').css('height', height + 'px');
-                    } else {
-                        movieBox.css('height', '100%');
-                        movieBox.find('img').css('height', '100%');
-                        const width = Math.floor(movieBox.height() * owidth / oheight);
-                        movieBox.css('width', width + 'px');
-                        movieBox.find('img').css('width', width + 'px');
-                    }
-                    $.fn.isystkMovie.setPartsPosition(movieBox, movieBox.width(), movieBox.height());
+					const x = Math.floor(oheight * $(window).width() / owidth);
+					const margin = Math.floor((panelHeight - x) / 2) || 0;
+					if (0 <= margin) {
+						self.css('width', '100%');
+						const height = Math.floor($(window).width() * oheight / owidth);
+						self.css('height', height + 'px');
+					} else {
+						self.css('height', '100%');
+						const width = Math.floor(panelHeight * owidth / oheight);
+						self.css('width', width + 'px');
+					}
 
-                    if (0 < margin) {
-                        photo.closest('.childKey').css('padding-top', margin + 'px');
-                    } else {
-                        const marginLeft = Math.floor(($(window).width() - movieBox.width()) / 2);
-                        if (0 <= marginLeft) {
-                            movieBox.css('margin-left', marginLeft + 'px');
-                        }
-                    }
-                } else {
-                    // 画像
+					if (isMovieBox) {
+						// 動画サムネイル
+	
+						$.fn.isystkMovie.setPartsPosition(self, self.width(), self.height());
 
-                    const x = Math.floor(oheight * $(window).width() / owidth);
-                    const padding = Math.floor((panelHeight - x) / 2);
+						self.css('margin','auto');
+						if (0 < margin) {
+							self.css('margin-top', margin + 'px');
+						}
+						self.find('img').css('margin-top',  '');
+	
+					} else {
+						// Videoタグ
 
-                    if (0 <= padding) {
-                        // 表示領域のアスペクト比に比べて横長の場合
-                        photo
-                            .css('height', '')
-                            .css('width', '100%')
-                        ;
-                        photo.css('margin-top', padding + 'px');
-                    } else {
-                        // 表示領域のアスペクト比に比べて縦長の場合
-                        photo
-                            .css('height', panelHeight + 'px')
-                            .css('width', '')
-                            .css('margin-y', 'auto');
-                    }
-                }
+						self.css('margin-top', '0');
+						if (0 < margin) {
+							// 横長の場合は上部にマージンを追加
+							self.css('margin-top', margin + 'px');
+						}
+	
+					}
+				}
             };
 
             // 再生済みのVideoを動画サムネイルに戻します。
@@ -427,17 +443,23 @@
             const changeMovieBox = (target) => {
                 target.addClass('play');
                 target.isystkMovie({
+                    callbackfunc: function () {
+                        // 余白の調整
+                        appendMargin(target);
+                    },
                     // 動画再生時
                     clickCallback: function (obj) {
                         // 動画再生時にキャプションパネルを非表示にする。
                         mainFlame.find('.photo_enlarge_partsArea').hide();
+						// 余白の調整
+						appendMargin(target);
                     },
                     // 動画停止時
                     pauseCallback: function () {
                         // 動画停止時にキャプションエリアを再表示する
                         mainFlame.find('.photo_enlarge_partsArea').show();
                     }
-                });
+				});
             }
 
             // メインフレームを生成
