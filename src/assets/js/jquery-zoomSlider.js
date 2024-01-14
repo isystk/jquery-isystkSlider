@@ -17,6 +17,7 @@
                 targetClass = params.targetClass,
                 vertical = params.vertical,
                 carousel = params.carousel,
+                color = params.color,
                 panelHeight = 600; // 子要素のスライドする高さ
 
             const targets = screen
@@ -63,10 +64,18 @@
             // メインフレームを生成します。
             const makeFlame = () => {
 
+                let backGroundColor = '#000';
+                let fontColor = '#fff';
+                let closeBtnClass = 'close';
+                if (color === 'white') {
+                    backGroundColor = '#fff';
+                    fontColor = '#000';
+                    closeBtnClass = 'close black';
+                }
                 const mainFlame = $([
                     '<div class="isystk-overlay zoomPhotoPanel" style="position: fixed;">',
-                    '<a href="#" class="js-close close"></a>',
-                    '<div class="js-slider" style="height: 100%;margin 0 auto;background-color: #000;">',
+                    '<a href="#" class="js-close '+closeBtnClass+'"></a>',
+                    '<div class="js-slider" style="height: 100%;margin 0 auto;background-color: '+backGroundColor+';">',
                     '<ul class="parentKey photo_enlarge_imageArea">',
                     '</ul>',
                     '</div>',
@@ -80,8 +89,9 @@
                     '<a href="#"></a>' +
                     '</p>',
                     '</div>',
-                    '<div class="commentArea" style="position: absolute;height: 29%;background: #000;opacity:' +
-                    ' 0.8;color:#fff;z-index: 10002;box-sizing: border-box;bottom: 0;width: 100%;padding: 10px;">',
+                    '<div class="commentArea" style="position: absolute;height: 29%;background: '+backGroundColor+';opacity:' +
+                    ' 0.8;color:'+fontColor+';z-index: 10002;box-sizing: border-box;bottom: 0;width: 100%;padding:' +
+                    ' 10px;">',
                     '<div class="comment">',
                     '<p class="caption_txt captionArea"></p>',
                     '<div style="display: flex;justify-content: center;position:relative;">',
@@ -484,6 +494,7 @@
         , vertical: false // 縦方向にスライドさせるかどうか
         , moviePlay: true // 表示すると同時に動画を再生するかどうか
         , carousel: true // １ページ目または、最終ページに到達した場合に、ローテートさせるかどうか
+        , color: 'black' // テーマカラー（black or white）
     };
 
 })(jQuery);

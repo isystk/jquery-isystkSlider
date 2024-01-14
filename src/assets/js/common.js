@@ -69,6 +69,7 @@ $(function () {
     $('.zoom-slider').each(function () {
         $(this).zoomSlider({
             targetClass: 'img.zoom',
+            color: 'white',
         });
     });
 

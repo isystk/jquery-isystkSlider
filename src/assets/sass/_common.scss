@@ -187,6 +187,10 @@ body {
   background-size:100% auto;
   width: 30px;
   height: 30px;
+  &.black {
+    background: url('../images/close.png') 0 0 no-repeat;
+    background-size: 100% auto;
+  }
 }
 .isystk-overlay .next-btn {
   background: url('../images/btn-next.svg') 0 0 no-repeat;
