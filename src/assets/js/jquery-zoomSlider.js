@@ -16,6 +16,7 @@
             const screen = $(obj),
                 targetClass = params.targetClass,
                 vertical = params.vertical,
+                carousel = params.carousel,
                 panelHeight = 600; // 子要素のスライドする高さ
 
             const targets = screen
@@ -213,7 +214,7 @@
                     , 'vertical': vertical
                     , 'responsive': true
                     , 'animateType': $.fn.isystkSlider.ANIMATE_TYPE.SLIDE
-                    , 'carousel': true
+                    , 'carousel': carousel 
                     , 'slideCallBack': function ({obj, pageNo}) {
 
                         // 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
@@ -482,6 +483,7 @@
         , openCallBack: null // 拡大表示後のコールバック
         , vertical: false // 縦方向にスライドさせるかどうか
         , moviePlay: true // 表示すると同時に動画を再生するかどうか
+        , carousel: true // １ページ目または、最終ページに到達した場合に、ローテートさせるかどうか
     };
 
 })(jQuery);
