@@ -270,10 +270,6 @@
                 screen.find(targetClass).each(function (i) {
                     let target = $(this);
 
-                    if (target.hasClass('js-movie')) {
-                        target = target.next();
-                    }
-
                     target.css('cursor', 'pointer');
                     target.bind('click', function (e) {
                         e.preventDefault();
