@@ -94,10 +94,9 @@
 
                 // 動画サムネイルをクリックした際にモーダルで動画を表示する。
                 if (isModalPlay) {
-                    const targetImgParent = targetImg.parent();
+					targetImg.addClass('zoom');
+					const targetImgParent = movieBox.parent();
                     targetImgParent.attr('page-no', 1);
-					targetImgParent.find('.movieBox').find('img').addClass('js-movie');
-                    targetImgParent.find('.movieBox').find('img').addClass('zoom');
                     targetImgParent.zoomSlider({
                         targetClass: '.zoom',
                         vertical: true,

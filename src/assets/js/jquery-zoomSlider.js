@@ -49,8 +49,10 @@
                     let self = $(this);
                     let imagePath = self.attr('src') || '';
                     // オリジナルの画像パスに変更
-                    imagePath = imagePath
-                        .replace(/_sd/g, '');
+                    if (imagePath) {
+                        imagePath = imagePath
+                            .replace(/_sd/g, '');
+                    }
                     const caption = self.attr('alt') || '';
                     const isMovie = self.hasClass('js-movie');
                     return {
@@ -269,6 +271,9 @@
                 // 対象画像クリック時に拡大写真パネルを表示する
                 screen.find(targetClass).each(function (i) {
                     let target = $(this);
+                    if (target.hasClass('js-movie')) {
+                        target = target.next();
+                    }
 
                     target.css('cursor', 'pointer');
                     target.bind('click', function (e) {

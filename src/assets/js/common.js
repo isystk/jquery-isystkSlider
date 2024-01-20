@@ -62,25 +62,26 @@ $(function () {
         });
     });
 
-    // 拡大画像スライダー
-    $('.zoom-slider').each(function () {
-        $(this).zoomSlider({
-            targetClass: 'img.zoom',
-            color: 'white',
-        });
-    });
-
-    // 拡大画像スライダー（縦方向）
-    $('.zoom-slider-vertical').each(function () {
-        $(this).zoomSlider({
-            targetClass: 'img.zoom',
-            vertical: true
-        });
-    });
-
     window.onload = function() {
         // 動画
         $('img.js-movie').isystkMovie();
+        
+        // 拡大画像スライダー
+        $('.zoom-slider').each(function () {
+            $(this).zoomSlider({
+                targetClass: 'img.zoom',
+                color: 'white',
+            });
+        });
+
+        // 拡大画像スライダー（縦方向）
+        $('.zoom-slider-vertical').each(function () {
+            $(this).zoomSlider({
+                targetClass: 'img.zoom',
+                vertical: true
+            });
+        });
+
     }
 
 });
