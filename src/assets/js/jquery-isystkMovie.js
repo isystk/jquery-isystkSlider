@@ -94,8 +94,8 @@
 
                 // 動画サムネイルをクリックした際にモーダルで動画を表示する。
                 if (isModalPlay) {
-					targetImg.addClass('zoom');
-					const targetImgParent = movieBox.parent();
+                    targetImg.addClass('zoom');
+                    const targetImgParent = movieBox.parent();
                     targetImgParent.attr('page-no', 1);
                     targetImgParent.zoomSlider({
                         targetClass: '.zoom',
@@ -251,7 +251,7 @@
         };
 
         // 動画を再生します。
-        const playVideo = function (video) {
+        const playVideo = $.fn.isystkMovie.playVideo = function (video) {
             if (!video[0].paused) {
                 return;
             }
@@ -259,27 +259,29 @@
         };
 
         // 動画を停止します。
-        const pauseVideo = function (video) {
+        const pauseVideo = $.fn.isystkMovie.pauseVideo = function (video) {
             if (video[0].paused) {
                 return;
             }
             video[0].pause();
         };
 
+        // Videoタグをタップで動画の再生・停止を切り替えます。
         const bindVideoClick = $.fn.isystkMovie.bindVideoClick = function (video) {
-            $(video).each(function () {
-                $(this).bind('click', function (event) {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    event.stopImmediatePropagation();
-
-                    if (video[0].paused) {
-                        playVideo(video);
-                    } else {
-                        pauseVideo(video);
-                    }
-                });
-            });
+            // シークバー操作ができなくなるのでコメントアウト
+            // $(video).each(function () {
+            //     $(this).bind('click', function (event) {
+            //         event.preventDefault();
+            //         event.stopPropagation();
+            //         event.stopImmediatePropagation();
+            //
+            //         if (video[0].paused) {
+            //             playVideo(video);
+            //         } else {
+            //             pauseVideo(video);
+            //         }
+            //     });
+            // });
         };
 
         // 動画サムネイルの「再生ボタン」・「再生時間」の表示位置を調整します。

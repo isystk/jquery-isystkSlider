@@ -13,12 +13,17 @@
         // 初期設定
         const init = (obj) => {
 
-            const screen = $(obj),
+            let screen = $(obj),
                 targetClass = params.targetClass,
                 vertical = params.vertical,
                 carousel = params.carousel,
                 color = params.color,
                 panelHeight = 600; // 子要素のスライドする高さ
+
+            if (window.innerHeight < panelHeight) {
+                // 画面の高さが600より小さい場合はパネルの高さを (画面の高さ ー  マージン）にする。
+                panelHeight = window.innerHeight - 40;
+            }
 
             const targets = screen
                 .find(targetClass)
@@ -76,10 +81,17 @@
                 }
                 const mainFlame = $([
                     '<div class="isystk-overlay zoomPhotoPanel" style="position: fixed;">',
-                    '<a href="#" class="js-close '+closeBtnClass+'"></a>',
-                    '<div class="js-slider" style="height: 100%;margin 0 auto;background-color: '+backGroundColor+';">',
+                    '<a href="#" class="js-close ' + closeBtnClass + '"></a>',
+                    '<div class="js-slider" style="height: 100%;margin 0 auto;background-color: ' + backGroundColor + ';">',
                     '<ul class="parentKey photo_enlarge_imageArea">',
                     '</ul>',
+                    '</div>',
+                    '<div class="transport_partsArea" style="display: none">',
+                    '<div style="background-color: #000;width: 100%;height: 100%;position: absolute;top: 0;opacity: 0.8;"></div>',
+                    '<div style="width: 100%;height: 200px;position: absolute;top: 40%;text-align:center;">',
+                    '<a href="#" class="continue-btn" style="padding: 7px;display: block;width: 60%;margin: 5px auto 20px;text-decoration: none; background-color: #fff;">続きを見る</a>',
+                    '<a href="#" class="replay-btn" style="padding: 7px;display: block;width: 60%;margin: 5px auto 20px;text-decoration: none; background-color: #fff;">もう一度見る</a>',
+                    '</div>',
                     '</div>',
                     '<div class="photo_enlarge_partsArea">',
                     '<div class="transitionArea transitionList">',
@@ -91,8 +103,8 @@
                     '<a href="#"></a>' +
                     '</p>',
                     '</div>',
-                    '<div class="commentArea" style="position: absolute;height: 29%;background: '+backGroundColor+';opacity:' +
-                    ' 0.8;color:'+fontColor+';z-index: 10002;box-sizing: border-box;bottom: 0;width: 100%;padding:' +
+                    '<div class="commentArea" style="position: absolute;height: 29%;background: ' + backGroundColor + ';opacity:' +
+                    ' 0.8;color:' + fontColor + ';z-index: 10002;box-sizing: border-box;bottom: 0;width: 100%;padding:' +
                     ' 10px;">',
                     '<div class="comment">',
                     '<p class="caption_txt captionArea"></p>',
@@ -115,7 +127,7 @@
                 mainFlame.addClass(className);
 
                 // スライダーの上部にパディングを追加（画面高さ ー ヘッダ高さ ー マージン ー パネルの高さ）
-                const paddingTop = Math.floor(($(window).height() - 40 - panelHeight) / 2);
+                const paddingTop = Math.floor((window.innerHeight - 40 - panelHeight) / 2);
                 mainFlame.find('.js-slider').css('padding-top', paddingTop + 'px');
 
                 // 拡大パネル自体のスワイプによる拡大・縮小処理を殺す
@@ -226,7 +238,7 @@
                     , 'vertical': vertical
                     , 'responsive': true
                     , 'animateType': $.fn.isystkSlider.ANIMATE_TYPE.SLIDE
-                    , 'carousel': carousel 
+                    , 'carousel': carousel
                     , 'slideCallBack': function ({obj, pageNo}) {
 
                         // 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
@@ -334,6 +346,27 @@
 
                     mainFlame.css('visibility', 'hidden')
                 });
+
+                // 導線エリア内の「続きを見る」ボタン制御
+                mainFlame.find('.transport_partsArea .continue-btn').click(function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    mainFlame.find('.transport_partsArea').hide();
+                    mainFlame.find('.photo_enlarge_partsArea').hide();
+                    const video = mainFlame.slider.find('.childKey[zoom-page-no="' + currentPageNo + '"]').find('video');
+                    $.fn.isystkMovie.playVideo(video);
+                });
+
+                // 導線エリア内の「もう一度見る」ボタン制御
+                mainFlame.find('.transport_partsArea .replay-btn').click(function (e) {
+                    e.preventDefault();
+                    // Videoタグを削除して動画サムネイルに戻す
+                    revertImageFromVideo(mainFlame);
+                    setTimeout(function () {
+                        mainFlame.slider.find('.childKey[zoom-page-no="' + currentPageNo + '"]').find('.movieBox ').trigger('click');
+                    }, 300);
+                });
+
             };
 
             // 補足情報を変更します
@@ -408,7 +441,7 @@
 
                     if (isMovieBox) {
                         // 動画サムネイル
-	
+
                         $.fn.isystkMovie.setPartsPosition(self, self.width(), self.height());
 
                         self.css('margin', 'auto');
@@ -456,15 +489,39 @@
                         // 余白の調整
                         appendMargin(target);
                     },
-                    // 動画再生時
+                    // 動画サムネイルクリック時
                     clickCallback: function (obj) {
-                        // 動画再生時にキャプションパネルを非表示にする。
-                        mainFlame.find('.photo_enlarge_partsArea').hide();
                         // 余白の調整
                         appendMargin(target);
+                        // 動画再生時にキャプションパネルを非表示にする。
+                        mainFlame.find('.photo_enlarge_partsArea').hide();
+                    },
+                    // 動画再生時
+                    playCallback: function () {
+                        // 動画停止時に詳細画面への導線エリアを非表示にする。
+                        mainFlame.find('.transport_partsArea').hide();
+                        // 動画再生時にキャプションパネルを非表示にする。
+                        mainFlame.find('.photo_enlarge_partsArea').hide();
                     },
                     // 動画停止時
                     pauseCallback: function () {
+                        // 動画停止時に詳細画面への導線エリアを表示する
+                        mainFlame.find('.transport_partsArea').show();
+                        // 「続きを見る」ボタンを表示する
+                        mainFlame.find('.continue-btn').show();
+                        // 「もう一度見る」ボタンを非表示にする
+                        mainFlame.find('.replay-btn').hide();
+                        // 動画停止時にキャプションエリアを再表示する
+                        mainFlame.find('.photo_enlarge_partsArea').show();
+                    },
+                    // 動画再生終了時
+                    endedCallback: function () {
+                        // 動画停止時に詳細画面への導線エリアを表示する
+                        mainFlame.find('.transport_partsArea').show();
+                        // 「続きを見る」ボタンを非表示にする
+                        mainFlame.find('.continue-btn').hide();
+                        // 「もう一度見る」ボタンを表示する
+                        mainFlame.find('.replay-btn').show();
                         // 動画停止時にキャプションエリアを再表示する
                         mainFlame.find('.photo_enlarge_partsArea').show();
                     }

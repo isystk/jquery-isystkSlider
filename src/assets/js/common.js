@@ -62,10 +62,10 @@ $(function () {
         });
     });
 
-    window.onload = function() {
+    window.onload = function () {
         // 動画
         $('img.js-movie').isystkMovie();
-        
+       
         // 拡大画像スライダー
         $('.zoom-slider').each(function () {
             $(this).zoomSlider({
