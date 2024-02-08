@@ -20,7 +20,7 @@
                 color = params.color,
                 panelHeight = 600; // 子要素のスライドする高さ
 
-            if (window.innerHeight < panelHeight) {
+            if (window.innerHeight - 40 < panelHeight) {
                 // 画面の高さが600より小さい場合はパネルの高さを (画面の高さ ー  マージン）にする。
                 panelHeight = window.innerHeight - 40;
             }
@@ -266,19 +266,19 @@
 
                 // 子要素をタップ時にキャプションの表示/非表示を切り替える。
                 let showPartsArea = true;
-                slider.click(function (e) {
-                    const partsArea = mainFlame.find('.photo_enlarge_partsArea');
-                    const timer = setTimeout(function () {
-                        clearInterval(timer);
-                        if (showPartsArea) {
-                            partsArea.hide();
-                            showPartsArea = false;
-                        } else {
-                            partsArea.show();
-                            showPartsArea = true;
-                        }
-                    }, 200);
-                });
+                // slider.click(function (e) {
+                //     const partsArea = mainFlame.find('.photo_enlarge_partsArea');
+                //     const timer = setTimeout(function () {
+                //         clearInterval(timer);
+                //         if (showPartsArea) {
+                //             partsArea.hide();
+                //             showPartsArea = false;
+                //         } else {
+                //             partsArea.show();
+                //             showPartsArea = true;
+                //         }
+                //     }, 200);
+                // });
 
                 // 対象画像クリック時に拡大写真パネルを表示する
                 screen.find(targetClass).each(function (i) {
