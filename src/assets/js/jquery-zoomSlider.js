@@ -479,6 +479,10 @@
                         changeMovieBox(photo);
                     }
                 });
+                setTimeout(function () {
+                    // 動画停止時に詳細画面への導線エリアを非表示する
+                    mainFlame.find('.transport_partsArea').hide();
+                }, 100)
             };
 
             // 画像を動画再生用サムネイルに変換
