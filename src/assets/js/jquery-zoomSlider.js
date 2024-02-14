@@ -87,10 +87,11 @@
                     '</ul>',
                     '</div>',
                     '<div class="transport_partsArea" style="display: none">',
-                    '<div style="background-color: #000;width: 100%;height: 100%;position: absolute;top: 0;opacity: 0.8;"></div>',
-                    '<div style="width: 100%;height: 200px;position: absolute;top: 40%;text-align:center;">',
-                    '<a href="#" class="continue-btn" style="padding: 7px;display: block;width: 60%;margin: 5px auto 20px;text-decoration: none; background-color: #fff;">続きを見る</a>',
-                    '<a href="#" class="replay-btn" style="padding: 7px;display: block;width: 60%;margin: 5px auto 20px;text-decoration: none; background-color: #fff;">もう一度見る</a>',
+                    '<div style="width: 100%;position: absolute;top: 40%;text-align:center;">',
+                    '<a href="#" class="continue-btn" style="padding: 7px;display: block;width: 200px;margin: 50px' +
+                    ' auto 20px;text-decoration: none; background-color: #fff;">続きを見る</a>',
+                    '<a href="#" class="replay-btn" style="padding: 7px;display: block;width: 200px;margin: 50px auto' +
+                    ' 20px;text-decoration: none; background-color: #fff;">もう一度見る</a>',
                     '</div>',
                     '</div>',
                     '<div class="photo_enlarge_partsArea">',
@@ -241,12 +242,17 @@
                     , 'carousel': carousel
                     , 'slideCallBack': function ({obj, pageNo}) {
 
+                        // 現在表示中のページ番号を切り替える
+                        const zoomPageNo = parseInt(obj.attr('zoom-page-no'));
+                        if (currentPageNo === zoomPageNo) {
+                            // ページが切り替わっていない場合は何もしない
+                            return
+                        }
+                        currentPageNo = zoomPageNo;
+
                         // 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
                         revertImageFromVideo(mainFlame);
-
-                        // 現在表示中のページ番号を切り替える
-                        currentPageNo = parseInt(obj.attr('zoom-page-no'));
-
+                        
                         let prevPageNo = currentPageNo - 1;
                         if (prevPageNo <= 0) {
                             prevPageNo = maxPageNo
