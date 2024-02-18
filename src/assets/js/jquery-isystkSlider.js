@@ -1257,6 +1257,9 @@
             ul.find('.cloned').remove()
 
             li = ul.find(childKey);
+            if (li.length === 0) {
+                pos = 0;
+            }
             if (_pos === undefined) {
                 // 追加位置が未指定の場合は最後に追加する
                 _pos = li.length - 1;

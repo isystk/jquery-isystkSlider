@@ -18,7 +18,8 @@
                 vertical = params.vertical,
                 carousel = params.carousel,
                 color = params.color,
-                panelHeight = 600; // 子要素のスライドする高さ
+				panelHeight = window.innerHeight, // 子要素のスライドする高さ
+				panelMarginY = 40;
 
             if (window.innerHeight - 40 < panelHeight) {
                 // 画面の高さが600より小さい場合はパネルの高さを (画面の高さ ー  マージン）にする。
@@ -127,9 +128,9 @@
                 mainFlame.attr('id', 'zoomSlider' + index);
                 mainFlame.addClass(className);
 
-                // スライダーの上部にパディングを追加（画面高さ ー ヘッダ高さ ー マージン ー パネルの高さ）
-                const paddingTop = Math.floor((window.innerHeight - 40 - panelHeight) / 2);
-                mainFlame.find('.js-slider').css('padding-top', paddingTop + 'px');
+                // // スライダーの上部にパディングを追加（画面高さ ー ヘッダ高さ ー マージン ー パネルの高さ）
+                // const paddingTop = Math.floor((window.innerHeight - 40 - panelHeight) / 2);
+                // mainFlame.find('.js-slider').css('padding-top', paddingTop + 'px');
 
                 // 拡大パネル自体のスワイプによる拡大・縮小処理を殺す
                 mainFlame[0].addEventListener('touchmove', function (e) {
@@ -138,6 +139,12 @@
 
                 $('body').append(mainFlame);
 
+				$(window).resize(function () {
+					panelHeight = window.innerHeight;
+					mainFlame.find('.js-close').click();
+					mainFlame.find('.childKey').remove();
+				});
+				
                 return mainFlame;
             }
 
@@ -156,14 +163,14 @@
                 }
                 const data = targetItems[pageNo - 1]
                 const li = $([
-                    '<li class="childKey" zoom-page-no="' + pageNo + '" style="text-align: center;margin: 20px 0;">',
+                    '<li class="childKey" zoom-page-no="' + pageNo + '" style="text-align: center;margin: '+panelMarginY+'px 0;">',
                     '<img src="' + data.imagePath + '" alt="' + data.caption + '" class="' + (data.isMovie ? 'js-movie' : '') + '" />',
                     '</li>'
                 ].join(''));
 
                 // 子要素の横幅を端末のwidthに設定
                 li.width($(window).width());
-                li.height(panelHeight);
+				li.height(panelHeight - (panelMarginY*2));
 
                 const index = findAppendPos(pageNo)
 
@@ -244,14 +251,14 @@
 
                         // 現在表示中のページ番号を切り替える
                         const zoomPageNo = parseInt(obj.attr('zoom-page-no'));
-                        if (currentPageNo === zoomPageNo) {
-                            // ページが切り替わっていない場合は何もしない
-                            return
+                        if (currentPageNo !== zoomPageNo) {
+    						// 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
+    						revertImageFromVideo(mainFlame);
+
+    						// 補足情報を表示する
+    						mainFlame.find('.photo_enlarge_partsArea').show();
                         }
                         currentPageNo = zoomPageNo;
-
-                        // 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
-                        revertImageFromVideo(mainFlame);
                         
                         let prevPageNo = currentPageNo - 1;
                         if (prevPageNo <= 0) {
@@ -390,8 +397,6 @@
                 // ページ番号
                 mainFlame.find('.commentArea .count').text(`${pageNo}/${targets.length}`);
 
-                // 補足情報を表示する
-                mainFlame.find('.photo_enlarge_partsArea').show();
             };
 
             // 上下左右に余白を追加する。
@@ -400,12 +405,13 @@
                     owidth = parseInt(photo.attr('owidth')) || 0,
                     moviePath = photo.data('moviepath') || '',
                     isMovie = (moviePath !== '') ? true : false;
-
+                
+				var viewHeight = panelHeight - (panelMarginY*2);
                 if (!isMovie) {
                     // 画像
 
                     const x = Math.floor(photo.height() * $(window).width() / photo.width());
-                    const margin = Math.floor((panelHeight - x) / 2) || 0;
+                    const margin = Math.floor((viewHeight - x) / 2) || 0;
 
                     photo.css('margin', 'auto');
                     photo.css('margin-top', '0');
@@ -415,14 +421,14 @@
 
                     if (!photo.hasClass('js-pinchOut')) {
                         const x = Math.floor(oheight * $(window).width() / owidth);
-                        const margin = Math.floor((panelHeight - x) / 2) || 0;
+                        const margin = Math.floor((viewHeight - x) / 2) || 0;
                         if (0 <= margin) {
                             photo.css('width', '100%');
                             const height = Math.floor($(window).width() * oheight / owidth);
                             photo.css('height', height + 'px');
                         } else {
                             photo.css('height', '100%');
-                            const width = Math.floor(panelHeight * owidth / oheight);
+                            const width = Math.floor(viewHeight * owidth / oheight);
                             photo.css('width', width + 'px');
                         }
                     }
@@ -434,14 +440,14 @@
                         isMovieBox = self.hasClass('movieBox');
 
                     const x = Math.floor(oheight * $(window).width() / owidth);
-                    const margin = Math.floor((panelHeight - x) / 2) || 0;
+                    const margin = Math.floor((viewHeight - x) / 2) || 0;
                     if (0 <= margin) {
                         self.css('width', '100%');
                         const height = Math.floor($(window).width() * oheight / owidth);
                         self.css('height', height + 'px');
                     } else {
                         self.css('height', '100%');
-                        const width = Math.floor(panelHeight * owidth / oheight);
+                        const width = Math.floor(viewHeight * owidth / oheight);
                         self.css('width', width + 'px');
                     }
 
