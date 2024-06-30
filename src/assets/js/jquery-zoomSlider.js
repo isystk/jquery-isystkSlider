@@ -17,14 +17,7 @@
                 targetClass = params.targetClass,
                 vertical = params.vertical,
                 carousel = params.carousel,
-                color = params.color,
-				panelHeight = window.innerHeight, // 子要素のスライドする高さ
-				panelMarginY = 40;
-
-            if (window.innerHeight - 40 < panelHeight) {
-                // 画面の高さが600より小さい場合はパネルの高さを (画面の高さ ー  マージン）にする。
-                panelHeight = window.innerHeight - 40;
-            }
+                color = params.color;
 
             const targets = screen
                 .find(targetClass)
@@ -128,10 +121,6 @@
                 mainFlame.attr('id', 'zoomSlider' + index);
                 mainFlame.addClass(className);
 
-                // // スライダーの上部にパディングを追加（画面高さ ー ヘッダ高さ ー マージン ー パネルの高さ）
-                // const paddingTop = Math.floor((window.innerHeight - 40 - panelHeight) / 2);
-                // mainFlame.find('.js-slider').css('padding-top', paddingTop + 'px');
-
                 // 拡大パネル自体のスワイプによる拡大・縮小処理を殺す
                 mainFlame[0].addEventListener('touchmove', function (e) {
                     e.preventDefault();
@@ -139,12 +128,15 @@
 
                 $('body').append(mainFlame);
 
-				$(window).resize(function () {
-					panelHeight = window.innerHeight;
-					mainFlame.find('.js-close').click();
-					mainFlame.find('.childKey').remove();
-				});
-				
+                $(window).resize(function () {
+                    const children = mainFlame.find('.childKey');
+                    children.each(function () {
+                        let photo = $(this).find('img')
+                        // 余白の調整
+                        appendMargin(photo);
+                    });
+                });
+                
                 return mainFlame;
             }
 
@@ -163,14 +155,14 @@
                 }
                 const data = targetItems[pageNo - 1]
                 const li = $([
-                    '<li class="childKey" zoom-page-no="' + pageNo + '" style="text-align: center;margin: '+panelMarginY+'px 0;">',
+                    '<li class="childKey" zoom-page-no="' + pageNo + '" style="display: flex;justify-content: center;align-items: center;">',
                     '<img src="' + data.imagePath + '" alt="' + data.caption + '" class="' + (data.isMovie ? 'js-movie' : '') + '" />',
                     '</li>'
                 ].join(''));
 
                 // 子要素の横幅を端末のwidthに設定
-                li.width($(window).width());
-				li.height(panelHeight - (panelMarginY*2));
+                li.css('width', '100vw');
+                li.css('height', '100vh');
 
                 const index = findAppendPos(pageNo)
 
@@ -252,11 +244,11 @@
                         // 現在表示中のページ番号を切り替える
                         const zoomPageNo = parseInt(obj.attr('zoom-page-no'));
                         if (currentPageNo !== zoomPageNo) {
-    						// 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
-    						revertImageFromVideo(mainFlame);
+                            // 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
+                            revertImageFromVideo(mainFlame);
 
-    						// 補足情報を表示する
-    						mainFlame.find('.photo_enlarge_partsArea').show();
+                            // 補足情報を表示する
+                            mainFlame.find('.photo_enlarge_partsArea').show();
                         }
                         currentPageNo = zoomPageNo;
                         
@@ -276,22 +268,6 @@
                         changeInfo(currentPageNo);
                     }
                 });
-
-                // 子要素をタップ時にキャプションの表示/非表示を切り替える。
-                let showPartsArea = true;
-                // slider.click(function (e) {
-                //     const partsArea = mainFlame.find('.photo_enlarge_partsArea');
-                //     const timer = setTimeout(function () {
-                //         clearInterval(timer);
-                //         if (showPartsArea) {
-                //             partsArea.hide();
-                //             showPartsArea = false;
-                //         } else {
-                //             partsArea.show();
-                //             showPartsArea = true;
-                //         }
-                //     }, 200);
-                // });
 
                 // 対象画像クリック時に拡大写真パネルを表示する
                 screen.find(targetClass).each(function (i) {
@@ -327,15 +303,6 @@
                         });
                     });
 
-                    // // オーバーレイの設定
-                    // target
-                    //     .attr('data-panel', '#' + mainFlame.attr('id'))
-                    //     .isystkOverlay({
-                    //         closeCallback: () => {
-                    //             // 動画が再生済みの場合は、Videoタグを削除して動画サムネイルに戻す
-                    //             revertImageFromVideo(mainFlame);
-                    //         }
-                    // });
                 });
 
                 // 拡大写真パネルスライダー 前ページクリック時
@@ -401,77 +368,10 @@
 
             // 上下左右に余白を追加する。
             const appendMargin = (photo) => {
-                const oheight = parseInt(photo.attr('oheight')) || 0,
-                    owidth = parseInt(photo.attr('owidth')) || 0,
-                    moviePath = photo.data('moviepath') || '',
-                    isMovie = (moviePath !== '') ? true : false;
-                
-				var viewHeight = panelHeight - (panelMarginY*2);
-                if (!isMovie) {
-                    // 画像
-
-                    const x = Math.floor(photo.height() * $(window).width() / photo.width());
-                    const margin = Math.floor((viewHeight - x) / 2) || 0;
-
-                    photo.css('margin', 'auto');
-                    photo.css('margin-top', '0');
-                    if (0 < margin) {
-                        photo.css('margin-top', margin + 'px');
-                    }
-
-                    if (!photo.hasClass('js-pinchOut')) {
-                        const x = Math.floor(oheight * $(window).width() / owidth);
-                        const margin = Math.floor((viewHeight - x) / 2) || 0;
-                        if (0 <= margin) {
-                            photo.css('width', '100%');
-                            const height = Math.floor($(window).width() * oheight / owidth);
-                            photo.css('height', height + 'px');
-                        } else {
-                            photo.css('height', '100%');
-                            const width = Math.floor(viewHeight * owidth / oheight);
-                            photo.css('width', width + 'px');
-                        }
-                    }
-
-                } else {
-                    // 動画
-
-                    const self = photo.next(),
-                        isMovieBox = self.hasClass('movieBox');
-
-                    const x = Math.floor(oheight * $(window).width() / owidth);
-                    const margin = Math.floor((viewHeight - x) / 2) || 0;
-                    if (0 <= margin) {
-                        self.css('width', '100%');
-                        const height = Math.floor($(window).width() * oheight / owidth);
-                        self.css('height', height + 'px');
-                    } else {
-                        self.css('height', '100%');
-                        const width = Math.floor(viewHeight * owidth / oheight);
-                        self.css('width', width + 'px');
-                    }
-
-                    if (isMovieBox) {
-                        // 動画サムネイル
-
-                        $.fn.isystkMovie.setPartsPosition(self, self.width(), self.height());
-
-                        self.css('margin', 'auto');
-                        if (0 < margin) {
-                            self.css('margin-top', margin + 'px');
-                        }
-                        self.find('img').css('margin-top', '');
-
-                    } else {
-                        // Videoタグ
-
-                        self.css('margin-top', '0');
-                        if (0 < margin) {
-                            // 横長の場合は上部にマージンを追加
-                            self.css('margin-top', margin + 'px');
-                        }
-
-                    }
+                if (photo.next().is("video")) {
+                    const video = photo.next();
+                    video.css('width', photo.width());
+                    video.css('height', photo.height());
                 }
             };
 
