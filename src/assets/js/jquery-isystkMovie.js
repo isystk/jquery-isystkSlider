@@ -302,8 +302,6 @@
                 movieBox.find('.playBtn').css('height', '30%');
             }
 
-            const playBtnTop = Math.floor((h * 0.5) - (playBtnHeight * 0.5));
-            const playBtnLeft = Math.floor((w * 0.5) - (playBtnWidth * 0.5));
             let playTimeFontSize = Math.floor(playBtnWidth * 0.25);
             if (20 < playTimeFontSize) {
                 playTimeFontSize = 20;
@@ -311,60 +309,15 @@
             const playTimeTop = Math.floor(h - (2 * playTimeFontSize));
 
             movieBox.css('width', w + 'px').css('height', h + 'px');
-            movieBox.find('.playBtn').css('top', playBtnTop + 'px').css('left', playBtnLeft + 'px');
+            movieBox.find('.playBtn')
+                .css('top', '50%')
+                .css('left', '50%')
+                .css('transform', 'translate(-50%, -50%)');
             movieBox.find('.playTime').css('top', playTimeTop + 'px').css('font-size', playTimeFontSize + 'px');
 
         };
 
-        // 画面が回転された場合
-        const restore = function (obj) {
-            const target = [];
-            $(obj).each(function () {
-                const self = $(this);
-                if (!self.hasClass('movieBox') || self.hasClass('noRestore')) {
-                    return;
-                }
-                const image = self.prev();
-                self.remove();
-                image.show();
-                target.push(image);
-            });
-
-            let maxCount = target.length;
-            const movieBoxs = [];
-            $(target).each(function () {
-                new init(this).exec(function (movieBox) {
-                    movieBoxs.push(movieBox);
-                    maxCount--;
-                    if (maxCount === 0 && callbackfunc) {
-                        callbackfunc(movieBoxs);
-                    }
-                });
-            });
-        }
-
         const target = $(this);
-
-        // 実機の場合は回転処理、それ以外はリサイズ処理
-        if (0 > navigator.userAgent.indexOf('iPhone') && 0 > navigator.userAgent.indexOf('iPad') && 0 > navigator.userAgent.indexOf('iPod') && 0 > navigator.userAgent.indexOf('Android')) {
-//			// 画面がリサイズされた場合
-//			$(window).resize(function() {
-//				restore(obj.next());
-//				if (resizeCallback) {
-//					resizeCallback(obj);
-//				}
-//			});
-        } else {
-            // 画面が回転された場合
-            $(window).on('orientationchange', function () {
-                setTimeout(function () {
-                    restore(obj.next());
-                    if (resizeCallback) {
-                        resizeCallback(obj);
-                    }
-                }, 200);
-            });
-        }
 
         let maxCount = target.length;
         const movieBoxs = [];
